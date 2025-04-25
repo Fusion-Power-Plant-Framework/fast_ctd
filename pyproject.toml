@@ -1,0 +1,15 @@
+[project]
+name = 'fast_ctd'
+version = '0.2.0'
+description = 'Fast CAD to DAGMC conversion toolset'
+readme = 'README.md'
+requires-python = '>=3.10'
+license = ''
+
+
+[build-system]
+build-backend = 'mesonpy'
+requires = [
+  'meson-python',
+  'meson >= 1.1.0',
+]
