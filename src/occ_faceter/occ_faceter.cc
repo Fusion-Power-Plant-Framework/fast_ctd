@@ -10,11 +10,11 @@ static bool has_ending(std::string s, std::string ending)
 }
 
 int occ_faceter(std::string input_brep_file,
-                std::string materials_file = "",
-                std::string output_h5m_file = "dagmc.h5m",
-                double tolerance = 0.001,
-                double scale_factor = 0.1,
-                bool tol_is_absolute = false)
+                std::string materials_file,
+                std::string output_h5m_file,
+                double tolerance,
+                double scale_factor,
+                bool tol_is_absolute)
 {
   bool add_mat_ids = true;
 
@@ -36,20 +36,13 @@ int occ_faceter(std::string input_brep_file,
 
   FacetingTolerance facet_tol(tolerance, tol_is_absolute);
 
-  spdlog::info(
-      "Starting occ_faceter:\n"
-      "  input_brep_file: {}\n"
-      "  materials_file: {}\n"
-      "  output_h5m_file: {}\n"
-      "  tolerance: {}\n"
-      "  scale_factor: {}\n"
-      "  tol_is_absolute: {}",
-      input_brep_file,
-      materials_file.empty() ? "not provided" : materials_file,
-      output_h5m_file,
-      tolerance,
-      scale_factor,
-      tol_is_absolute);
+  spdlog::info("Starting occ_faceter:");
+  spdlog::info("  input_brep_file: {}", input_brep_file);
+  spdlog::info("  materials_file: {}", mat_file);
+  spdlog::info("  output_h5m_file: {}", output_h5m_file);
+  spdlog::info("  tolerance: {}", tolerance);
+  spdlog::info("  scale_factor: {}", scale_factor);
+  spdlog::info("  tol_is_absolute: {}", tol_is_absolute);
 
   brep_faceter(input_brep_file, mat_file, facet_tol, output_h5m_file, add_mat_ids, scale_factor);
 

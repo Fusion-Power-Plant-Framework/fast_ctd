@@ -8,6 +8,7 @@ int occ_faceter(std::string input_brep_file,
                 std::string materials_file = "",
                 std::string output_h5m_file = "dagmc.h5m",
                 double tolerance = 0.001,
+                double scale_factor = 0.1,
                 bool tol_is_absolute = false);
 
 #endif // OCC_FACETER_HH

@@ -1,4 +1,4 @@
-name: bluemira
+name: fast_ctd
 channels:
   - conda-forge
 
@@ -19,9 +19,6 @@ variables:
 
 dependencies:
   - python >=3.10,<3.13
+  - nanobind
   - openmc>=0.14.0
-  # - pip
-  # - pip:
-  #     - -r ../requirements/uv/all.txt
-  #     - -r ../requirements/conda.txt
-  #     - -e ../[openmc]
+  - occt=7.6.3
