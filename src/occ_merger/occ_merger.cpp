@@ -17,7 +17,7 @@
 #include "geometry.hpp"
 #include "utils.hpp"
 
-int occ_merge(std::string path_in, std::string path_out, double tolerance = 0.001)
+int occ_merger(std::string path_in, std::string path_out, double tolerance = 0.001)
 {
 	document inp;
 	inp.load_brep_file(path_in.c_str());
@@ -82,7 +82,7 @@ int occ_merge(std::string path_in, std::string path_out, double tolerance = 0.00
 		std::exit(1);
 	}
 
-	spdlog::info("Writing merged shapes to file");
+	spdlog::info("Writing merged shapes to file: {}", path_out);
 
 	out.write_brep_file(path_out.c_str());
 

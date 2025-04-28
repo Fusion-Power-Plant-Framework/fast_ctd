@@ -11,16 +11,16 @@ NB_MODULE(fast_ctd_ext, m)
       m.doc() = "Python bindings for OpenCASCADE shape merging and faceting, "
                 "for the creation of moab .h5m DAGMC models";
 
-      m.def("merge", &occ_merge,
+      m.def("occ_merger", &occ_merger,
             "Merge shapes from an input BREP file and write the result to an output BREP file",
-            nb::arg("path_in"), nb::arg("path_out"));
+            nb::arg("path_in"), nb::arg("path_out"), nb::arg("tolerance") = 0.001);
 
-      m.def("facet", &occ_faceter,
-            "Facet a geometry and save it to a MOAB h5m file");
-      // nb::arg("input_brep_file"),
-      // nb::arg("materials_file") = "",
-      // nb::arg("output_h5m_file") = "dagmc.h5m",
-      // nb::arg("tolerance") = 0.001,
-      // nb::arg("scale_factor") = 0.01,
-      // nb::arg("tol_is_absolute") = false);
+      m.def("occ_faceter", &occ_faceter,
+            "Facet a geometry and save it to a MOAB h5m file",
+            nb::arg("input_brep_file"),
+            nb::arg("materials_file") = "",
+            nb::arg("output_h5m_file") = "dagmc.h5m",
+            nb::arg("tolerance") = 0.001,
+            nb::arg("scale_factor") = 0.1,
+            nb::arg("tol_is_absolute") = false);
 }
