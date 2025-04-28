@@ -4,6 +4,6 @@
 #include <string>
 
 // Function to merge shapes from an input BREP file and write the result to an output BREP file
-int occ_merger(std::string path_in, std::string path_out, double tolerance = 0.001);
+int occ_merger(std::string input_brep_file, std::string output_brep_file, double tolerance);
 
 #endif // OCC_MERGER_HPP

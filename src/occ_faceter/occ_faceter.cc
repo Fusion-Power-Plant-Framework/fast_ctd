@@ -43,6 +43,7 @@ int occ_faceter(std::string input_brep_file,
   spdlog::info("  tolerance: {}", tolerance);
   spdlog::info("  scale_factor: {}", scale_factor);
   spdlog::info("  tol_is_absolute: {}", tol_is_absolute);
+  spdlog::info("");
 
   brep_faceter(input_brep_file, mat_file, facet_tol, output_h5m_file, add_mat_ids, scale_factor);
 

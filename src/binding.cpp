@@ -13,7 +13,7 @@ NB_MODULE(fast_ctd_ext, m)
 
       m.def("occ_merger", &occ_merger,
             "Merge shapes from an input BREP file and write the result to an output BREP file",
-            nb::arg("path_in"), nb::arg("path_out"), nb::arg("tolerance") = 0.001);
+            nb::arg("input_brep_file"), nb::arg("output_brep_file"), nb::arg("tolerance") = 0.001);
 
       m.def("occ_faceter", &occ_faceter,
             "Facet a geometry and save it to a MOAB h5m file",
