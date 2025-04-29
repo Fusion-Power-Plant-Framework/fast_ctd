@@ -1,8 +1,9 @@
 #include <iostream>
-#include "brep_faceter.hh"
 #include "moab/ProgOptions.hpp"
 
 #include <spdlog/spdlog.h>
+
+#include "brep_faceter.hpp"
 
 static bool has_ending(std::string s, std::string ending)
 {
@@ -36,6 +37,7 @@ int occ_faceter(std::string input_brep_file,
 
   FacetingTolerance facet_tol(tolerance, tol_is_absolute);
 
+  spdlog::info("");
   spdlog::info("Starting occ_faceter:");
   spdlog::info("  input_brep_file: {}", input_brep_file);
   spdlog::info("  materials_file: {}", mat_file);

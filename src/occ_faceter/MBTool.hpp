@@ -7,7 +7,8 @@
 
 #include "moab/Core.hpp"
 #include "MBTagConventions.hpp"
-#include "xyz_to_entity_map.hh"
+
+#include "xyz_to_entity_map.hpp"
 
 namespace moab
 {
