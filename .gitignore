@@ -3,6 +3,11 @@ builddir/
 .ruff_cache/
 node_modules/
 
+examples/data/*
+!examples/data/*.stp
+!examples/data/*.csv
+
+
 # Created by https://www.toptal.com/developers/gitignore/api/python,meson,c++
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,meson,c++
 
