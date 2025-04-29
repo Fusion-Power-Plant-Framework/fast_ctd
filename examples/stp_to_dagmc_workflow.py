@@ -1,9 +1,15 @@
-from fast_ctd import facet_brep_to_dagmc, merge_brep_geometries, step_to_brep
+from fast_ctd import (
+    facet_brep_to_dagmc,
+    make_watertight,
+    merge_brep_geometries,
+    step_to_brep,
+)
 
 input_stp_file = "data/EUDEMO.stp"
 brep_file = "data/EUDEMO.brep"
 merged_brep_file = "data/EUDEMO-merged.brep"
-output_dagmc_file = "data/EUDEMO.h5m"
+output_dagmc_file = "data/EUDEMO.nwt.h5m"
+output_wt_dagmc_file = "data/EUDEMO.h5m"
 
 # Convert STEP to BREP
 brep_file, list_of_component_names = step_to_brep(input_stp_file, brep_file)
@@ -21,5 +27,12 @@ facet_brep_to_dagmc(
     tol_is_absolute=False,
 )
 
-# then run (in terminal):
-# make_watertight data/EUDEMO.h5m -o data/EUDEMO-watertight.h5m
+# Make DAGMC model watertight
+make_watertight(output_dagmc_file, output_wt_dagmc_file)
+
+# Validate DAGMC model using OpenMC
+
+# validate_dagmc_model_using_openmc(
+#     dagmc_file=output_wt_dagmc_file,
+#     materials_def="data/EUDEMO-materials.csv",
+# )

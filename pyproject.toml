@@ -7,7 +7,7 @@ requires-python = '>=3.10'
 license = ''
 
 [project.optional-dependencies]
-dev = ["meson", "meson-python", "pre-commit", "pytest", "pytest-cov"]
+dev = ["meson", "meson-python", "pre-commit", "pytest", "pytest-cov", "ruff==0.11.7"]
 
 [build-system]
 build-backend = 'mesonpy'
