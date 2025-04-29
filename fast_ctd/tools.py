@@ -1,4 +1,4 @@
-from fast_ctd_ext import occ_faceter, occ_merger
+from fast_ctd_ext import occ_faceter, occ_merger, occ_step_to_brep
 
 # todo:
 # - move all defaulting etc. to the python side
@@ -15,8 +15,18 @@ from fast_ctd_ext import occ_faceter, occ_merger
 # - stadndarse the .cpp and .hpp extensions for all c++ sources
 
 
-def stp_to_brep(input_stp_file, output_brep_file=None) -> tuple[str, list[str]]:
-    pass
+def step_to_brep(
+    input_step_file: str, output_brep_file: str | None = None
+) -> tuple[str, list[str]]:
+    """Convert a STEP file to a BREP file and return the BREP file path and component names"""
+    occ_step_to_brep(
+        input_step_file,
+        output_brep_file,
+        minimum_volume=1,
+        check_geometry=True,
+        fix_geometry=False,
+    )
+    return output_brep_file, [""]
 
 
 def merge_brep_geometries(
