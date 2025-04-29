@@ -2,7 +2,7 @@
 #include <nanobind/stl/string.h>
 
 #include "occ_merger.hpp"
-#include "occ_faceter.hh"
+#include "occ_faceter.hpp"
 
 namespace nb = nanobind;
 

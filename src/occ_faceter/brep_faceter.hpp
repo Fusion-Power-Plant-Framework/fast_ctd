@@ -1,12 +1,14 @@
-#ifndef BREP_FACETER_HH
-#define BREP_FACETER_HH
+#ifndef BREP_FACETER_HPP
+#define BREP_FACETER_HPP
 
 #include <string>
 
 #include "TopoDS_Shape.hxx"
+
 #include "MBTool.hpp"
 
-struct FacetingTolerance {
+struct FacetingTolerance
+{
   float tolerance;
   bool is_relative;
 

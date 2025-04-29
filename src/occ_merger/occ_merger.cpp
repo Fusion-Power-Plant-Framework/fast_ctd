@@ -19,6 +19,7 @@
 
 int occ_merger(std::string input_brep_file, std::string output_brep_file, double tolerance)
 {
+	spdlog::info("");
 	spdlog::info("Starting occ_merger:");
 	spdlog::info("  input_brep_file: {}", input_brep_file);
 	spdlog::info("  output_brep_file: {}", output_brep_file);
