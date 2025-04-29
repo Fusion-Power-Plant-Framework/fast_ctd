@@ -1,8 +1,15 @@
+import subprocess
+
 from fast_ctd_ext import occ_faceter, occ_merger, occ_step_to_brep
+
+try:
+    import openmc
+except ImportError:
+    openmc = None
+
 
 # todo:
 # - move all defaulting etc. to the python side
-# - implement the stp_to_brep function
 # - add ests
 # - chagne tolerance in merger to dist_tolerance
 # - docstrings for every function, explaing what they do and what the inputs are and returns
@@ -12,7 +19,6 @@ from fast_ctd_ext import occ_faceter, occ_merger, occ_step_to_brep
 # - for facet_brep_to_dagmc, implement the mateirals_def, can pass in a file (path to list of materials) or a dict (mapping comp name to material name), or a list of materials
 # - stub file generation and installing from nanobind: python -m nanobind.stubgen -m fast_ctd_ext -M py.typed
 # - versioning the project with pyproject.toml and meson project version https://github.com/mesonbuild/meson/issues/688S
-# - stadndarse the .cpp and .hpp extensions for all c++ sources
 
 
 def step_to_brep(
@@ -42,6 +48,7 @@ def facet_brep_to_dagmc(
     output_h5m_file: str = "dagmc.h5m",
     tolerance: float = 0.001,
     scale_factor: float = 0.1,
+    *,
     tol_is_absolute: bool = False,
 ) -> int:
     """Facet a geometry and save it to a MOAB h5m file"""
@@ -53,3 +60,24 @@ def facet_brep_to_dagmc(
         scale_factor,
         tol_is_absolute,
     )
+
+
+def make_watertight(h5m_file: str, output_h5m_file: str = None) -> None:
+    """Make a geometry watertight using the make_watertight tool"""
+    try:
+        make_watertight = subprocess.run(
+            ["make_watertight", h5m_file, "-o", output_h5m_file],
+            check=True,
+            capture_output=True,
+        )
+    except subprocess.CalledProcessError as e:
+        print("Error running make_watertight")
+        print(e)
+    print(make_watertight.stdout.decode())
+
+
+def validate_dagmc_model_using_openmc(
+    dagmc_file: str,
+    materials_def: str | list | dict = "",
+) -> bool:
+    """Validate a DAGMC model using the validate_dagmc tool"""
