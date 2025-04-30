@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Example: stp_to_dagmc_workflow",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "stp_to_dagmc_workflow.py",
+      "cwd": "${workspaceFolder}/examples",
+      "console": "integratedTerminal"
+    }
+  ]
+}

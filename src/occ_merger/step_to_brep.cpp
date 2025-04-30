@@ -385,6 +385,16 @@ int occ_step_to_brep(
 	bool check_geometry,
 	bool fix_geometry)
 {
+
+	spdlog::info("");
+	spdlog::info("Starting occ_step_to_brep:");
+	spdlog::info("  input_step_file: {}", input_step_file);
+	spdlog::info("  output_brep_file: {}", output_brep_file);
+	spdlog::info("  minimum_volume: {}", minimum_volume);
+	spdlog::info("  check_geometry: {}", check_geometry);
+	spdlog::info("  fix_geometry: {}", fix_geometry);
+	spdlog::info("");
+
 	if (minimum_volume < 0)
 	{
 		spdlog::critical("minimum shape volume ({}) should not be negative", minimum_volume);
