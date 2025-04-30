@@ -1,3 +1,5 @@
+"""An example of a workflow to convert a STEP file to a DAGMC file using fast_ctd."""
+
 import logging
 
 from fast_ctd import (
