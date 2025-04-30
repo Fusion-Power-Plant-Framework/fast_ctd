@@ -2,6 +2,7 @@ project(
   'fast_ctd',
   'cpp',
   version: '0.1.0',
+   meson_version: '>= 1.1'
 )
 
 # Compilers
@@ -27,7 +28,7 @@ occ = dependency('OpenCASCADE', static: true)
 moab = dependency('MOAB', static: true)
 # Dependency('MOAB') fails to link properly when imported
 # the library path has to be manually set
-# libmoab = cpp.find_library('MOAB', dirs: py_env_lib)
+libmoab = cpp.find_library('MOAB', dirs: [py_env_lib, get_option('PY_LIB_PATH')])
 
 # Run each subdir meson.build
 
@@ -46,7 +47,7 @@ libocc_faceter = static_library(
   'occ_faceter',
   sources: [occ_faceter_src],
   include_directories: [occ_faceter_inc],
-  dependencies: [occ, spdlog, moab],
+  dependencies: [occ, spdlog, moab, libmoab],
 )
 
 message('Building fast_ctd_ext and install python module')

@@ -13,7 +13,7 @@ dev = ["meson", "meson-python", "pre-commit", "pytest", "pytest-cov", "ruff==0.1
 build-backend = 'mesonpy'
 requires = [
   'meson-python',
-  'meson >= 1.1.0',
+  'meson >= 1.8.0',
 ]
 
 [tool.ruff.lint]
