@@ -1,1 +1,1 @@
-option('PY_LIB_PATH', type: 'string', value: '')
+option('PY_ENV_ROOT_PATH', type: 'string', value: '')
