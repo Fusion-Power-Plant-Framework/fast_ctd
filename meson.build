@@ -63,6 +63,6 @@ py.extension_module(
 )
 # v annoying that you have list each file individually
 py.install_sources(
-  ['fast_ctd/__init__.py', 'fast_ctd/tools.py'],
+  ['fast_ctd/__init__.py', 'fast_ctd/tools.py', 'fast_ctd/logging.py'],
   subdir: 'fast_ctd',
 )
