@@ -2,7 +2,7 @@ project(
   'fast_ctd',
   'cpp',
   version: '0.1.0',
-   meson_version: '>= 1.1'
+   meson_version: '>= 1.8.0'
 )
 
 # Compilers
@@ -16,9 +16,20 @@ py = import('python').find_installation()
 
 # Useful paths
 
-py_env_root = fs.parent(fs.parent(py.full_path()))
+if get_option('PY_ENV_ROOT_PATH') == ''
+  py_env_root = fs.parent(fs.parent(py.full_path()))
+else
+  py_env_root = get_option('PY_ENV_ROOT_PATH')
+endif
 py_env_lib = py_env_root / 'lib'
 py_env_include = py_env_root / 'include'
+
+message('Python environment root: ' + py_env_root)
+if get_option('PY_ENV_ROOT_PATH') != ''
+  message('(set by user)')
+endif
+message('Python environment lib: ' + py_env_lib)
+message('Python environment include: ' + py_env_include)
 
 # Deps and libs
 
@@ -28,7 +39,7 @@ occ = dependency('OpenCASCADE', static: true)
 moab = dependency('MOAB', static: true)
 # Dependency('MOAB') fails to link properly when imported
 # the library path has to be manually set
-libmoab = cpp.find_library('MOAB', dirs: [py_env_lib, get_option('PY_LIB_PATH')])
+libmoab = cpp.find_library('MOAB', dirs: [py_env_lib], static: true)
 
 # Run each subdir meson.build
 

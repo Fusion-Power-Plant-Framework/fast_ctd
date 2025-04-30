@@ -19,10 +19,12 @@ variables:
 
 dependencies:
   - python >=3.10,<3.13
+  - cmake
   - nanobind
+  - spdlog=1.15.2=h10b92b3_0
   - openmc>=0.14.0
   - occt=7.6.3=all_h4c9f3c6_203
-  - cmake
-  - pip
-  - pip:
-      - -e ../[dev]
+  # - pip
+  # - pip:
+  #     - install build
+  # - -e ../[dev]
