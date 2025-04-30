@@ -23,7 +23,7 @@ output_dagmc_file = "data/EUDEMO_div_vv_via_shimwell_vv_is_void.h5m"
 output_wt_dagmc_file = "data/EUDEMO.h5m"
 
 # Convert STEP to BREP
-# brep_file, list_of_component_names = step_to_brep(input_stp_file, brep_file)
+brep_file, list_of_component_names = step_to_brep(input_stp_file, brep_file)
 
 # # Merge BREP geometries (i.e. imprinted geometries)
 # merge_brep_geometries(brep_file, merged_brep_file)
