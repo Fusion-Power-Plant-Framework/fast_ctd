@@ -22,12 +22,12 @@ py_env_include = py_env_root / 'include'
 # Deps and libs
 
 nanobind_dep = dependency('nanobind', static: true)
-spdlog = dependency('spdlog', version: '>=1.8.5')
-occ = dependency('OpenCASCADE')
-moab = dependency('MOAB')
+spdlog = dependency('spdlog', static: true)
+occ = dependency('OpenCASCADE', static: true)
+moab = dependency('MOAB', static: true)
 # Dependency('MOAB') fails to link properly when imported
 # the library path has to be manually set
-libmoab = cpp.find_library('MOAB', dirs: py_env_lib)
+# libmoab = cpp.find_library('MOAB', dirs: py_env_lib)
 
 # Run each subdir meson.build
 
@@ -46,7 +46,7 @@ libocc_faceter = static_library(
   'occ_faceter',
   sources: [occ_faceter_src],
   include_directories: [occ_faceter_inc],
-  dependencies: [occ, spdlog, moab, libmoab],
+  dependencies: [occ, spdlog, moab],
 )
 
 message('Building fast_ctd_ext and install python module')
