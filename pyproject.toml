@@ -7,11 +7,19 @@ requires-python = '>=3.10'
 license         = { text = 'GPL-2.0' }
 
 [project.optional-dependencies]
-dev = ["pre-commit", "pytest", "pytest-cov", "ruff==0.11.7"]
+dev = [
+  "build",
+  "meson-python",
+  "meson>=1.8.0",
+  "pre-commit",
+  "pytest",
+  "pytest-cov",
+  "ruff==0.11.7",
+]
 
 [build-system]
 build-backend = 'mesonpy'
-requires      = ['meson-python', 'meson >= 1.8.0']
+requires      = ['meson-python', 'meson>=1.8.0']
 
 [tool.ruff.lint]
 pydocstyle.convention = "google"
