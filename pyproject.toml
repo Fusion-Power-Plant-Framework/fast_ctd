@@ -25,16 +25,17 @@ requires      = ['meson-python', 'meson>=1.8.0']
 pydocstyle.convention = "google"
 select = ["ALL"]
 ignore = [
-  "E501",   # line too long
-  "E203",   # whitespace before ':'
-  "E722",   # do not use bare 'except'
-  "F401",   # module imported but unused
-  "F841",   # local variable is assigned to but never used
-  "F405",   # name may be undefined, or defined from star imports: module
-  "F841",   # local variable is assigned to but never used
+  "E501",    # line too long
+  "E203",    # whitespace before ':'
+  "E722",    # do not use bare 'except'
+  "F401",    # module imported but unused
+  "F841",    # local variable is assigned to but never used
+  "F405",    # name may be undefined, or defined from star imports: module
+  "F841",    # local variable is assigned to but never used
   "EM102",
   "ERA001",
   "TRY002",
   "TRY003",
   "INP001",
+  "PLR0913",
 ]

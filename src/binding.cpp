@@ -1,5 +1,6 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string.h>
+#include <nanobind/stl/vector.h>
 
 #include "step_to_brep.hpp"
 #include "occ_merger.hpp"
@@ -31,9 +32,10 @@ NB_MODULE(fast_ctd_ext, m)
       m.def("occ_faceter", &occ_faceter,
             "Facet a geometry and save it to a MOAB h5m file",
             nb::arg("input_brep_file"),
-            nb::arg("materials_file") = "",
-            nb::arg("output_h5m_file") = "dagmc.h5m",
-            nb::arg("tolerance") = 0.001,
-            nb::arg("scale_factor") = 0.1,
-            nb::arg("tol_is_absolute") = false);
+            nb::arg("output_h5m_file"),
+            nb::arg("materials_file"),
+            nb::arg("lin_deflection_tol"),
+            nb::arg("tol_is_absolute"),
+            nb::arg("scale_factor"),
+            nb::arg("logging") = false);
 }

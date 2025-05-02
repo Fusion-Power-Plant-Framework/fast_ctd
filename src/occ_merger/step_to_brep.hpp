@@ -2,6 +2,7 @@
 #define STEP_TO_BREP_HPP
 
 #include <string>
+#include <vector>
 
 /**
  * Converts a STEP file to a BREP file.
@@ -14,7 +15,7 @@
  * @param logging Whether to enable logging.
  * @return 0 if the conversion was successful, 1 if there was an error.
  */
-int occ_step_to_brep(
+std::vector<std::string> occ_step_to_brep(
     std::string input_step_file,
     std::string output_brep_file,
     double minimum_volume,

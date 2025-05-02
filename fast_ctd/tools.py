@@ -76,7 +76,7 @@ def step_to_brep(
         minimum_volume: The minimum volume for components to be included in the BREP file.
         check_geometry: Whether to check the geometry of the STEP file.
         fix_geometry: Whether to fix the geometry of the STEP file.
-        extension_logging: Whether to enable logging in the C++ extension
+        extension_logging: Whether to enable logging in the C++ extension code.
 
     Returns:
         An ordered list of component names in the BREP file.
@@ -100,33 +100,65 @@ def step_to_brep(
 
 
 def merge_brep_geometries(
-    input_brep_file,
-    output_brep_file=None,
+    input_brep_file: StrPath,
+    output_brep_file: StrPath,
     *,
     dist_tolerance: float = 0.001,
     extension_logging: bool = False,
 ) -> None:
-    """Merge vertices in a BREP file and save the result to a new BREP file"""
-    occ_merger(input_brep_file, output_brep_file, dist_tolerance)
+    """Merge vertices in a BREP file and save the result to a new BREP file.
+
+    Args:
+        input_brep_file: The path to the input BREP file.
+        output_brep_file: The path to the output BREP file.
+        dist_tolerance: The distance tolerance for merging vertices.
+        extension_logging: Whether to enable logging in the C++ extension code.
+    """
+    input_brep_file = Path(input_brep_file)
+    output_brep_file = Path(output_brep_file)
+
+    _validate_file_extension(input_brep_file, ".brep")
+    _validate_file_exists(input_brep_file)
+    _validate_file_extension(output_brep_file, ".brep")
+
+    occ_merger(
+        input_brep_file.as_posix(),
+        output_brep_file.as_posix(),
+        dist_tolerance,
+        extension_logging,
+    )
 
 
 def facet_brep_to_dagmc(
-    input_brep_file: str,
-    materials_def: str | Path | list[str],
-    output_h5m_file: str = "dagmc.h5m",
-    tolerance: float = 0.001,
-    scale_factor: float = 0.1,
+    input_brep_file: StrPath,
+    output_h5m_file: StrPath,
+    materials_file: StrPath,
     *,
+    lin_deflection_tol: float = 0.001,
     tol_is_absolute: bool = False,
+    scale_factor: float = 0.1,
+    extension_logging: bool = False,
 ) -> int:
     """Facet a geometry and save it to a MOAB h5m file"""
+
+    input_brep_file = Path(input_brep_file)
+    output_h5m_file = Path(output_h5m_file)
+    materials_file = Path(materials_file)
+
+    _validate_file_extension(input_brep_file, ".brep")
+    _validate_file_exists(input_brep_file)
+    _validate_file_extension(output_h5m_file, ".h5m")
+    _validate_file_extension(materials_file, ".csv")
+    _validate_file_exists(materials_file)
+
     occ_faceter(
-        input_brep_file,
-        materials_def,
-        output_h5m_file,
-        tolerance,
-        scale_factor,
+        input_brep_file.as_posix(),
+        output_h5m_file.as_posix(),
+        materials_file.as_posix(),
+        lin_deflection_tol,
         tol_is_absolute,
+        scale_factor,
+        extension_logging,
     )
 
 

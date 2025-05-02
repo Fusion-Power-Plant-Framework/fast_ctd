@@ -35,6 +35,8 @@
 #include "BRep_Builder.hxx"
 #include "NCollection_IndexedDataMap.hxx"
 
+#include <spdlog/spdlog.h>
+
 #include "MBTool.hpp"
 
 // Terminology:
@@ -107,14 +109,14 @@ private:
 
     if (edges.IsNull())
     {
-      std::cerr << "Warning: Unexpected null edges." << std::endl;
+      spdlog::warn("Unexpected null edges.");
       return;
     }
 
     const TColStd_Array1OfInteger &lines = edges->Nodes();
     if (lines.Length() < 2)
     {
-      std::cerr << "Warning: Attempting to build empty curve." << std::endl;
+      spdlog::warn("Attempting to build empty curve.");
       return;
     }
 
@@ -254,7 +256,6 @@ void BrepFaceter::create_surface_triangles(entity_vector &triangles,
                                            const Poly_Triangulation &triangulation,
                                            const entity_vector &nodes)
 {
-  //     std::cout << "Face has " << tris.Length() << " triangles" << std::endl;
   for (int i = 1; i <= triangulation.NbTriangles(); i++)
   {
     // get the node indexes for this triangle
@@ -313,14 +314,12 @@ void BrepFaceter::populate_all_surfaces()
   // one example geometry).
   if (surface_without_facet_count > 0)
   {
-    std::cerr << "Warning: " << surface_without_facet_count
-              << " surfaces found without facets." << std::endl;
+    spdlog::warn("{} surfaces found without facets.", surface_without_facet_count);
   }
 
   if (degenerate_triangle_count > 0)
   {
-    std::cerr << "Warning: " << degenerate_triangle_count
-              << " degenerate triangles have been ignored." << std::endl;
+    spdlog::warn("{} degenerate triangles have been ignored.", degenerate_triangle_count);
   }
 }
 
@@ -371,8 +370,9 @@ void add_materials(MBTool &mbtool, const entity_vector &volumes,
 
   if (mat_list.size() < volumes.size())
   {
-    std::cerr << "Error: Material list is too short." << std::endl;
-    return;
+    spdlog::error("Material list is too short. Expected {} materials, got {}",
+                  volumes.size(), mat_list.size());
+    std::exit(1);
   }
 
   // keep track of where we are in the material list
@@ -411,7 +411,8 @@ entity_vector sew_and_facet2(TopoDS_Shape &shape, const FacetingTolerance &facet
     // insert into the list
     shape_list.Append(sew.SewedShape());
   }
-  std::cout << "Instanciated " << shape_list.Length() << " items from file" << std::endl;
+
+  spdlog::info("Facetting {} solids", shape_list.Length());
 
   BrepFaceter bf(mbtool);
   return bf.facet(shape_list, facet_tol);
@@ -422,13 +423,19 @@ void read_materials_list(std::string text_file, std::vector<std::string> &mat_li
   std::ifstream text_stream(text_file);
   if (text_stream.fail())
   {
-    std::cerr << "Warning: Failed to read file " << text_file << std::endl;
+    spdlog::error("Failed to read file {}", text_file);
+    std::exit(1);
   }
   else
   {
     std::string line;
     while (std::getline(text_stream, line))
     {
+      // remove comma at the end of line
+      if (line.back() == ',')
+      {
+        line.pop_back();
+      }
       mat_list.push_back(line);
     }
   }
