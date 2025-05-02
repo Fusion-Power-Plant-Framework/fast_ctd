@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include <STEPCAFControl_Reader.hxx>
 #include <XCAFApp_Application.hxx>
@@ -46,7 +47,7 @@ assign_cstring(std::string &dst, const TCollection_ExtendedString &src)
 
 	if (len > dst.length())
 	{
-		spdlog::critical("potential memory corruption from utf8 string overflow. expected={} bytes got={}", dst.length(), len);
+		spdlog::error("potential memory corruption from utf8 string overflow. expected={} bytes got={}", dst.length(), len);
 		std::abort();
 	}
 	else if (len < dst.length())
@@ -316,16 +317,15 @@ public:
 		}
 	}
 
-	bool check_geometry()
+	void validate_geometry()
 	{
 		auto ninvalid = doc.count_invalid_shapes();
 		if (ninvalid)
 		{
-			spdlog::critical("{} shapes were not valid", ninvalid);
-			return false;
+			spdlog::error("{} shapes were not valid", ninvalid);
+			std::exit(1);
 		}
-		spdlog::info("geometry checks passed");
-		return true;
+		spdlog::info("Geometry checks passed");
 	}
 
 	void write_brep_file(const char *path)
@@ -334,7 +334,7 @@ public:
 	}
 };
 
-static bool
+static void
 load_step_file(const char *path, collector &col)
 {
 	auto app = XCAFApp_Application::GetApplication();
@@ -344,12 +344,12 @@ load_step_file(const char *path, collector &col)
 	reader.SetColorMode(true);
 	reader.SetMatMode(true);
 
-	spdlog::info("reading step file {}", path);
+	spdlog::info("Reading step file {}", path);
 
 	if (reader.ReadFile(path) != IFSelect_RetDone)
 	{
-		spdlog::critical("unable to read STEP file {}", path);
-		return false;
+		spdlog::error("unable to read STEP file {}", path);
+		std::exit(1);
 	}
 
 	spdlog::debug("transferring into doc");
@@ -358,8 +358,8 @@ load_step_file(const char *path, collector &col)
 	app->NewDocument("MDTV-XCAF", doc);
 	if (!reader.Transfer(doc))
 	{
-		spdlog::critical("failed to Transfer into document");
-		std::abort();
+		spdlog::error("failed to Transfer into document");
+		std::exit(1);
 	}
 
 	spdlog::debug("getting toplevel shapes");
@@ -374,11 +374,9 @@ load_step_file(const char *path, collector &col)
 	{
 		col.add_label(*shapetool, label);
 	}
-
-	return true;
 }
 
-int occ_step_to_brep(
+std::vector<std::string> occ_step_to_brep(
 	std::string input_step_file,
 	std::string output_brep_file,
 	double minimum_volume,
@@ -392,7 +390,13 @@ int occ_step_to_brep(
 	}
 	else
 	{
-		spdlog::set_level(spdlog::level::off);
+		spdlog::set_level(spdlog::level::err);
+	}
+
+	if (minimum_volume < 0)
+	{
+		spdlog::error("Minimum shape volume ({}) should not be negative", minimum_volume);
+		std::exit(1);
 	}
 
 	spdlog::info("");
@@ -404,17 +408,8 @@ int occ_step_to_brep(
 	spdlog::info("  fix_geometry: {}", fix_geometry);
 	spdlog::info("");
 
-	if (minimum_volume < 0)
-	{
-		spdlog::critical("minimum shape volume ({}) should not be negative", minimum_volume);
-		return 1;
-	}
-
 	collector doc(minimum_volume);
-	if (!load_step_file(input_step_file.c_str(), doc))
-	{
-		return 1;
-	}
+	load_step_file(input_step_file.c_str(), doc);
 
 	doc.log_summary();
 
@@ -428,14 +423,14 @@ int occ_step_to_brep(
 
 	if (check_geometry)
 	{
-		spdlog::debug("checking geometry");
-		if (!doc.check_geometry())
-		{
-			return 1;
-		}
+		spdlog::debug("Checking geometry");
+		doc.validate_geometry();
 	}
+
+	spdlog::info("writing brep file {}", output_brep_file);
 
 	doc.write_brep_file(output_brep_file.c_str());
 
-	return 0;
+	// return doc.get_materials();
+	return std::vector<std::string>{"hello", "world"};
 }

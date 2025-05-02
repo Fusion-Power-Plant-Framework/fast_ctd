@@ -17,7 +17,7 @@
 #include "geometry.hpp"
 #include "utils.hpp"
 
-int occ_merger(
+void occ_merger(
 	std::string input_brep_file,
 	std::string output_brep_file,
 	double dist_tolerance,
@@ -29,7 +29,7 @@ int occ_merger(
 	}
 	else
 	{
-		spdlog::set_level(spdlog::level::off);
+		spdlog::set_level(spdlog::level::err);
 	}
 
 	spdlog::info("");
@@ -76,7 +76,7 @@ int occ_merger(
 	if (inp.solid_shapes.size() != out.solid_shapes.size())
 	{
 		spdlog::error(
-			"number of shapes changed after merge, {} => {}",
+			"Number of shapes changed after merge, {} => {}",
 			inp.solid_shapes.size(),
 			out.solid_shapes.size());
 		std::exit(1);
@@ -102,9 +102,7 @@ int occ_merger(
 		std::exit(1);
 	}
 
-	spdlog::info("Writing merged shapes .brep file");
+	spdlog::info("Writing .brep output file {}", output_brep_file);
 
 	out.write_brep_file(output_brep_file.c_str());
-
-	return 0;
 }
