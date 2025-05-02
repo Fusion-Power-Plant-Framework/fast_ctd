@@ -3,7 +3,6 @@
 It provides tooling around the API, such as default values, input validation and logging.
 """
 
-import logging
 import re
 import subprocess as sp
 import sys
@@ -22,14 +21,9 @@ StrPath = str | Path
 
 
 # todo:
-# - move all defaulting etc. to the python side
 # - add ests
-# - chagne tolerance in merger to dist_tolerance
-# - docstrings for every function, explaing what they do and what the inputs are and returns
 # - add a README.md with usage examples
 # - add openmc validation work
-# - for stp_to_brep, impl. the outputting of component names (i.e. the ordering and the names)
-# - for facet_brep_to_dagmc, implement the mateirals_def, can pass in a file (path to list of materials) or a dict (mapping comp name to material name), or a list of materials
 # - stub file generation and installing from nanobind: python -m nanobind.stubgen -m fast_ctd_ext -M py.typed
 # - versioning the project with pyproject.toml and meson project version https://github.com/mesonbuild/meson/issues/688S
 
@@ -67,7 +61,7 @@ def step_to_brep(
     check_geometry: bool = True,
     fix_geometry: bool = False,
     enable_logging: bool = False,
-) -> list[str]:
+) -> list[list[str]]:
     """Convert a STEP file to a BREP file and return the BREP file path and component names.
 
     Args:
@@ -79,7 +73,7 @@ def step_to_brep(
         enable_logging: Whether to enable logging in the C++ extension code.
 
     Returns:
-        An ordered list of component names in the BREP file.
+        An ordered list of component groups and names in the BREP file.
     """
     input_step_file = Path(input_step_file)
     output_brep_file = Path(output_brep_file)
@@ -145,29 +139,40 @@ def merge_brep_geometries(
 def facet_brep_to_dagmc(
     input_brep_file: StrPath,
     output_h5m_file: StrPath,
-    materials_file: StrPath,
+    materials_csv_file: StrPath,
     *,
     lin_deflection_tol: float = 0.001,
     tol_is_absolute: bool = False,
     scale_factor: float = 0.1,
     enable_logging: bool = False,
-) -> int:
-    """Facet a geometry and save it to a MOAB h5m file"""
+) -> None:
+    """Facet .brep geometry and save it to a DAGMC MOAB .h5m file.
 
+    Args:
+        input_brep_file: The path to the input BREP file.
+        output_h5m_file: The path to the output MOAB file (.h5m).
+        materials_csv_file: The path to the materials definition file (.csv).
+        lin_deflection_tol: Linear deflection tolerance for faceting.
+        tol_is_absolute:
+            Whether the lin_deflection_tol is absolute
+            or relative to edge length.
+        scale_factor: Scale factor for the geometry.
+        enable_logging: Whether to enable logging in the C++ extension code.
+    """
     input_brep_file = Path(input_brep_file)
     output_h5m_file = Path(output_h5m_file)
-    materials_file = Path(materials_file)
+    materials_csv_file = Path(materials_csv_file)
 
     _validate_file_extension(input_brep_file, ".brep")
     _validate_file_exists(input_brep_file)
     _validate_file_extension(output_h5m_file, ".h5m")
-    _validate_file_extension(materials_file, ".csv")
-    _validate_file_exists(materials_file)
+    _validate_file_extension(materials_csv_file, ".csv")
+    _validate_file_exists(materials_csv_file)
 
     occ_faceter(
         input_brep_file.as_posix(),
         output_h5m_file.as_posix(),
-        materials_file.as_posix(),
+        materials_csv_file.as_posix(),
         lin_deflection_tol,
         tol_is_absolute,
         scale_factor,
@@ -176,24 +181,21 @@ def facet_brep_to_dagmc(
 
 
 def make_watertight(
-    h5m_file: str | Path,
-    output_h5m_file: str | Path | None = None,
-) -> Path:
+    h5m_file: StrPath,
+    output_h5m_file: StrPath,
+) -> None:
     """Make a geometry watertight using the make_watertight tool.
 
-    This function utilizes the `make_watertight` tool to process a given `.h5m`
-    geometry file and ensure it is watertight. The function validates the input
-    paths, runs the tool, and checks the output for any leaky volumes. If the
-    geometry is not watertight, log files are generated for further inspection.
+    This function utilizes the `make_watertight` from tool from DAGMC
+    to process a given `.h5m` and attempt to fix any leaky volumes in the
+    geometry file, ensuring it is watertight. If the
+    geometry is cannot be made watertight, log files are generated for further inspection.
 
     Args:
         h5m_file: The path to the input `.h5m` file to be processed.
         output_h5m_file: The path to the output
             `.h5m` file. If not provided, the output file will be named based
             on the input file with a `-wt` suffix.
-
-    Returns:
-        The path to the output `.h5m` file.
 
     Raises:
         FileNotFoundError: If the `make_watertight` binary or the input file
@@ -204,11 +206,7 @@ def make_watertight(
     """
     make_watertight_bin_path = Path(sys.executable).parent / "make_watertight"
     h5m_file = Path(h5m_file)
-    output_h5m_file = (
-        Path(output_h5m_file)
-        if output_h5m_file
-        else h5m_file.with_stem(h5m_file.stem + "-wt")
-    )
+    output_h5m_file = Path(output_h5m_file)
 
     _validate_file_exists(
         make_watertight_bin_path,
@@ -254,15 +252,13 @@ def make_watertight(
 
         log_warn(
             "make_watertight finished successfully, but the model is not watertight. "
-            "Check log files for details.",
+            "Check log files for further details.",
             more_info={
                 "output_file": output_h5m_file,
                 "stout_log": stout_log_dump_path,
                 "sterr_log": sterr_log_dump_path,
             },
         )
-
-    return output_h5m_file
 
 
 def validate_dagmc_model_using_openmc(

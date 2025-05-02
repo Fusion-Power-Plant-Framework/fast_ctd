@@ -16,30 +16,23 @@ merged_brep_file = "data/EUDEMO-merged.brep"
 output_dagmc_file = "data/EUDEMO-nwt.h5m"
 output_wt_dagmc_file = "data/EUDEMO.h5m"
 
-# Convert STEP to BREP
-# comps_info = step_to_brep(
-#     input_stp_file,
-#     brep_file,
-#     enable_logging=True,
-# )
-
-# # Merge BREP geometries (i.e. imprinted geometries)
-# merge_brep_geometries(
-#     brep_file,
-#     merged_brep_file,
-#     enable_logging=True,
-# )
-
-# Facet BREP to DAGMC
+comps_info = step_to_brep(
+    input_stp_file,
+    brep_file,
+    enable_logging=True,
+)
+merge_brep_geometries(
+    brep_file,
+    merged_brep_file,
+    enable_logging=True,
+)
 facet_brep_to_dagmc(
     merged_brep_file,
     output_h5m_file=output_dagmc_file,
-    materials_file="data/EUDEMO-materials.csv",
+    materials_csv_file="data/EUDEMO-materials.csv",
     enable_logging=True,
 )
-
-# Make DAGMC model watertight
-# make_watertight(output_dagmc_file, output_wt_dagmc_file)
+make_watertight(output_dagmc_file, output_wt_dagmc_file)
 
 # Validate DAGMC model using OpenMC
 
