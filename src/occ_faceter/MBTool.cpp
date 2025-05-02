@@ -3,30 +3,10 @@
 #include <iostream>
 #include <cstring>
 
+#include <spdlog/spdlog.h>
+
 #include "moab/GeomTopoTool.hpp"
 #include "moab/Types.hpp"
-
-// namespace moab
-// {
-//   const char *const ErrorCodeStr[] = {
-//       "MB_SUCCESS",
-//       "MB_FAILURE",
-//       "MB_INDEX_OUT_OF_RANGE",
-//       "MB_MEMORY_ALLOCATION_FAILED",
-//       "MB_ENTITY_NOT_FOUND",
-//       "MB_MULTIPLE_ENTITIES_FOUND",
-//       "MB_TAG_NOT_FOUND",
-//       "MB_FILE_DOES_NOT_EXIST",
-//       "MB_FILE_WRITE_ERROR",
-//       "MB_ALREADY_ALLOCATED",
-//       "MB_VARIABLE_DATA_LENGTH",
-//       "MB_INVALID_SIZE",
-//       "MB_UNSUPPORTED_OPERATION",
-//       "MB_UNHANDLED_OPTION",
-//       "MB_INVALID_ARGUMENT",
-//       "MB_ERROR",
-//       "MB_LAST_CODE"};
-// }
 
 const char geom_categories[][CATEGORY_TAG_SIZE] = {"Vertex\0",
                                                    "Curve\0",
@@ -203,8 +183,7 @@ void MBTool::add_group(const std::string &name, const entity_vector &entities)
   strncpy(namebuf, name.c_str(), NAME_TAG_SIZE - 1);
   if (name.length() >= (unsigned)NAME_TAG_SIZE)
   {
-    std::cout << "WARNING: group name '" << name.c_str()
-              << "' truncated to '" << namebuf << "'" << std::endl;
+    spdlog::warn("WARNING: group name '{}' truncated to '{}'", name.c_str(), namebuf);
   }
   CHECK_MOAB_RVAL(mbi->tag_set_data(name_tag, &group, 1, namebuf));
   CHECK_MOAB_RVAL(mbi->add_entities(group, entities.data(), entities.size()));
@@ -335,8 +314,12 @@ size_t MBTool::get_number_of_meshsets()
 // add all entities to rootset
 void MBTool::gather_ents()
 {
-  std::cout << "ent counts: " << entity_id[0] << " " << entity_id[1]
-            << " " << entity_id[2] << " " << entity_id[3] << " " << entity_id[4] << std::endl;
+  spdlog::info("Entity counts: ");
+  spdlog::info("  Vertices: {}", entity_id[0]);
+  spdlog::info("  Edges/curves: {}", entity_id[1]);
+  spdlog::info("  Surfaces: {}", entity_id[2]);
+  spdlog::info("  Volumes: {}", entity_id[3]);
+  spdlog::info("  Groups: {}", entity_id[4]);
 
   moab::Range ents;
   CHECK_MOAB_RVAL(mbi->get_entities_by_handle(0, ents));

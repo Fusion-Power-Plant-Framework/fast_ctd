@@ -18,3 +18,12 @@ def log_warn(msg: str, *, more_info: dict[str, Any] | None = None) -> None:
         for key, value in more_info.items():
             msg += f"\n {key}: {value}"
     logger.warning(msg)
+
+
+def config_basic_logging() -> None:
+    """Configure basic logging."""
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )

@@ -25,6 +25,8 @@ requires      = ['meson-python', 'meson>=1.8.0']
 pydocstyle.convention = "google"
 select = ["ALL"]
 ignore = [
+  "T201",
+  "T203",
   "E501",    # line too long
   "E203",    # whitespace before ':'
   "E722",    # do not use bare 'except'

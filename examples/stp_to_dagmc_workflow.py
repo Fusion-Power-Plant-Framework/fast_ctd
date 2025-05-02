@@ -1,39 +1,41 @@
 """An example of a workflow to convert a STEP file to a DAGMC file using fast_ctd."""
 
-import logging
-
 from fast_ctd import (
     facet_brep_to_dagmc,
     make_watertight,
     merge_brep_geometries,
     step_to_brep,
 )
+from fast_ctd.logging import config_basic_logging
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
+config_basic_logging()
 
 input_stp_file = "data/EUDEMO.stp"
 brep_file = "data/EUDEMO.brep"
 merged_brep_file = "data/EUDEMO-merged.brep"
 output_dagmc_file = "data/EUDEMO-nwt.h5m"
-# output_dagmc_file = "data/EUDEMO_div_vv_via_shimwell_vv_is_void.h5m"
 output_wt_dagmc_file = "data/EUDEMO.h5m"
 
 # Convert STEP to BREP
-# list_of_component_names = step_to_brep(input_stp_file, brep_file)
+# comps_info = step_to_brep(
+#     input_stp_file,
+#     brep_file,
+#     enable_logging=True,
+# )
 
-# Merge BREP geometries (i.e. imprinted geometries)
-merge_brep_geometries(brep_file, merged_brep_file, extension_logging=True)
+# # Merge BREP geometries (i.e. imprinted geometries)
+# merge_brep_geometries(
+#     brep_file,
+#     merged_brep_file,
+#     enable_logging=True,
+# )
 
 # Facet BREP to DAGMC
 facet_brep_to_dagmc(
     merged_brep_file,
     output_h5m_file=output_dagmc_file,
     materials_file="data/EUDEMO-materials.csv",
-    extension_logging=True,
+    enable_logging=True,
 )
 
 # Make DAGMC model watertight
