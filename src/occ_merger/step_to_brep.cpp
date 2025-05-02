@@ -383,8 +383,17 @@ int occ_step_to_brep(
 	std::string output_brep_file,
 	double minimum_volume,
 	bool check_geometry,
-	bool fix_geometry)
+	bool fix_geometry,
+	bool logging)
 {
+	if (logging)
+	{
+		spdlog::set_level(spdlog::level::debug);
+	}
+	else
+	{
+		spdlog::set_level(spdlog::level::off);
+	}
 
 	spdlog::info("");
 	spdlog::info("Starting occ_step_to_brep:");
