@@ -456,12 +456,20 @@ void brep_faceter(std::string brep_file, std::string materials_list_file,
   // TODO: review use of GEOMETRY_RESABS
   mbtool.set_faceting_tol_tag(facet_tol.tolerance);
   mbtool.set_scale_factor(scale_factor);
+
+  spdlog::info("Begin faceting");
   entity_vector volumes = sew_and_facet2(shape, facet_tol, mbtool);
+
+  spdlog::info("Adding materials to volumes");
   add_materials(mbtool, volumes, materials_list);
 
   if (add_mat_ids)
     mbtool.add_mat_ids();
 
+  spdlog::info("Gathering entities");
   mbtool.gather_ents();
+
+  spdlog::info("Writing DAGMC model to {}", h5m_file);
+
   mbtool.write_geometry(h5m_file.c_str());
 }

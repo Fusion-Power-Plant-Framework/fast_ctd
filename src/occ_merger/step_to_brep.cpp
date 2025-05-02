@@ -48,7 +48,7 @@ assign_cstring(std::string &dst, const TCollection_ExtendedString &src)
 	if (len > dst.length())
 	{
 		spdlog::error("potential memory corruption from utf8 string overflow. expected={} bytes got={}", dst.length(), len);
-		std::abort();
+		std::exit(1);
 	}
 	else if (len < dst.length())
 	{
@@ -135,10 +135,14 @@ class collector
 
 	double minimum_volume;
 
-	int label_num, n_small, n_negative_volume;
+	int n_groups, n_small, n_negative_volume;
+
+	std::vector<std::string> added_comps_info;
 
 	void add_solids(const TDF_Label &label)
 	{
+		n_groups += 1;
+
 		std::string color;
 		std::string label_name{"unnammed"};
 		std::string material_name{"unknown"};
@@ -152,7 +156,7 @@ class collector
 		if (!XCAFDoc_ShapeTool::GetShape(label, doc_shape))
 		{
 			spdlog::error("unable to get shape {}", label_name);
-			std::abort();
+			std::exit(1);
 		}
 
 		// add the solids to our list of things to do
@@ -179,32 +183,19 @@ class collector
 
 			doc.solid_shapes.emplace_back(shape);
 
-			// ! this prints the geometry list
-
-			const auto ss = std::cout.precision(1);
-			std::cout
-				<< label_num << ','
-				<< label_name << ','
-				<< std::fixed << volume << ','
-				<< color << ','
-				<< material_name << ','
-				<< material_density << '\n';
-			std::cout.precision(ss);
+			added_comps_info.push_back(
+				std::to_string(n_groups) + ',' + label_name);
 		}
 	}
 
 public:
 	collector(double minimum_volume) : minimum_volume{minimum_volume},
-									   label_num{0}, n_small{0}, n_negative_volume{0}
+									   n_groups{0}, n_small{0}, n_negative_volume{0}
 	{
 	}
 
 	void add_label(XCAFDoc_ShapeTool &shapetool, const TDF_Label &label)
 	{
-		TopoDS_Shape shape;
-
-		label_num += 1;
-
 		if (shapetool.IsAssembly(label))
 		{
 			// loop over other labelled parts
@@ -223,7 +214,7 @@ public:
 
 	void log_summary()
 	{
-		spdlog::info("enumerated {} labels, resulting in {} solids", label_num, doc.solid_shapes.size());
+		spdlog::info("enumerated {} groups, resulting in {} solids", n_groups, doc.solid_shapes.size());
 		if (n_small > 0)
 		{
 			spdlog::warn("{} solids were excluded because they were too small", n_small);
@@ -332,6 +323,11 @@ public:
 	{
 		doc.write_brep_file(path);
 	}
+
+	const std::vector<std::string> &get_added_comps_info() const
+	{
+		return added_comps_info;
+	}
 };
 
 static void
@@ -431,6 +427,5 @@ std::vector<std::string> occ_step_to_brep(
 
 	doc.write_brep_file(output_brep_file.c_str());
 
-	// return doc.get_materials();
-	return std::vector<std::string>{"hello", "world"};
+	return doc.get_added_comps_info();
 }

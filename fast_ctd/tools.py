@@ -66,7 +66,7 @@ def step_to_brep(
     minimum_volume: float = 1.0,
     check_geometry: bool = True,
     fix_geometry: bool = False,
-    extension_logging: bool = False,
+    enable_logging: bool = False,
 ) -> list[str]:
     """Convert a STEP file to a BREP file and return the BREP file path and component names.
 
@@ -76,7 +76,7 @@ def step_to_brep(
         minimum_volume: The minimum volume for components to be included in the BREP file.
         check_geometry: Whether to check the geometry of the STEP file.
         fix_geometry: Whether to fix the geometry of the STEP file.
-        extension_logging: Whether to enable logging in the C++ extension code.
+        enable_logging: Whether to enable logging in the C++ extension code.
 
     Returns:
         An ordered list of component names in the BREP file.
@@ -88,15 +88,28 @@ def step_to_brep(
     _validate_file_exists(input_step_file)
     _validate_file_extension(output_brep_file, ".brep")
 
-    occ_step_to_brep(
+    comps_info_list = occ_step_to_brep(
         input_step_file.as_posix(),
         output_brep_file.as_posix(),
         minimum_volume=minimum_volume,
         check_geometry=check_geometry,
         fix_geometry=fix_geometry,
-        logging=extension_logging,
+        logging=enable_logging,
     )
-    return [""]
+    if not isinstance(comps_info_list, list):
+        raise TypeError(
+            f"Expected a list of component info, but got {type(comps_info_list)}",
+        )
+
+    ret_comps_info_list = []
+    for ci in comps_info_list:
+        if not isinstance(ci, str):
+            raise TypeError(
+                f"Expected a string component info, but got {type(ci)}",
+            )
+        ret_comps_info_list.append(ci.split(","))
+
+    return ret_comps_info_list
 
 
 def merge_brep_geometries(
@@ -104,7 +117,7 @@ def merge_brep_geometries(
     output_brep_file: StrPath,
     *,
     dist_tolerance: float = 0.001,
-    extension_logging: bool = False,
+    enable_logging: bool = False,
 ) -> None:
     """Merge vertices in a BREP file and save the result to a new BREP file.
 
@@ -112,7 +125,7 @@ def merge_brep_geometries(
         input_brep_file: The path to the input BREP file.
         output_brep_file: The path to the output BREP file.
         dist_tolerance: The distance tolerance for merging vertices.
-        extension_logging: Whether to enable logging in the C++ extension code.
+        enable_logging: Whether to enable logging in the C++ extension code.
     """
     input_brep_file = Path(input_brep_file)
     output_brep_file = Path(output_brep_file)
@@ -125,7 +138,7 @@ def merge_brep_geometries(
         input_brep_file.as_posix(),
         output_brep_file.as_posix(),
         dist_tolerance,
-        extension_logging,
+        enable_logging,
     )
 
 
@@ -137,7 +150,7 @@ def facet_brep_to_dagmc(
     lin_deflection_tol: float = 0.001,
     tol_is_absolute: bool = False,
     scale_factor: float = 0.1,
-    extension_logging: bool = False,
+    enable_logging: bool = False,
 ) -> int:
     """Facet a geometry and save it to a MOAB h5m file"""
 
@@ -158,7 +171,7 @@ def facet_brep_to_dagmc(
         lin_deflection_tol,
         tol_is_absolute,
         scale_factor,
-        extension_logging,
+        enable_logging,
     )
 
 
