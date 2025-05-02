@@ -16,13 +16,17 @@ NB_MODULE(fast_ctd_ext, m)
             "Convert a STEP file to a BREP file",
             nb::arg("input_step_file"),
             nb::arg("output_brep_file"),
-            nb::arg("minimum_volume") = 1,
-            nb::arg("check_geometry") = true,
-            nb::arg("fix_geometry") = false);
+            nb::arg("minimum_volume"),
+            nb::arg("check_geometry"),
+            nb::arg("fix_geometry"),
+            nb::arg("logging") = false);
 
       m.def("occ_merger", &occ_merger,
             "Merge shapes from an input BREP file and write the result to an output BREP file",
-            nb::arg("input_brep_file"), nb::arg("output_brep_file"), nb::arg("tolerance") = 0.001);
+            nb::arg("input_brep_file"),
+            nb::arg("output_brep_file"),
+            nb::arg("dist_tolerance"),
+            nb::arg("logging") = false);
 
       m.def("occ_faceter", &occ_faceter,
             "Facet a geometry and save it to a MOAB h5m file",

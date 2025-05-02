@@ -3,6 +3,7 @@
 It provides tooling around the API, such as default values, input validation and logging.
 """
 
+import logging
 import re
 import subprocess as sp
 import sys
@@ -16,6 +17,8 @@ try:
     import openmc
 except ImportError:
     openmc = None
+
+StrPath = str | Path
 
 
 # todo:
@@ -31,11 +34,19 @@ except ImportError:
 # - versioning the project with pyproject.toml and meson project version https://github.com/mesonbuild/meson/issues/688S
 
 
-def _validate_file_extension(file_path: Path, expected_extension: str) -> None:
+def _validate_file_extension(
+    file_path: Path,
+    expected_extension: str | tuple[str],
+) -> None:
     """Validate the file extension of a given file path."""
-    if not file_path.suffix == expected_extension:
+    expected_extension = (
+        (expected_extension,)
+        if isinstance(expected_extension, str)
+        else expected_extension
+    )
+    if file_path.suffix not in expected_extension:
         raise ValueError(
-            f"File must have {expected_extension} extension, but got {file_path.suffix}",
+            f"File must be one of {expected_extension}, but got {file_path.suffix}",
         )
 
 
@@ -49,24 +60,54 @@ def _validate_file_exists(
 
 
 def step_to_brep(
-    input_step_file: str, output_brep_file: str | None = None
-) -> tuple[str, list[str]]:
-    """Convert a STEP file to a BREP file and return the BREP file path and component names"""
+    input_step_file: StrPath,
+    output_brep_file: StrPath,
+    *,
+    minimum_volume: float = 1.0,
+    check_geometry: bool = True,
+    fix_geometry: bool = False,
+    extension_logging: bool = False,
+) -> list[str]:
+    """Convert a STEP file to a BREP file and return the BREP file path and component names.
+
+    Args:
+        input_step_file: The path to the input STEP file.
+        output_brep_file: The path to the output BREP file.
+        minimum_volume: The minimum volume for components to be included in the BREP file.
+        check_geometry: Whether to check the geometry of the STEP file.
+        fix_geometry: Whether to fix the geometry of the STEP file.
+        extension_logging: Whether to enable logging in the C++ extension
+
+    Returns:
+        An ordered list of component names in the BREP file.
+    """
+    input_step_file = Path(input_step_file)
+    output_brep_file = Path(output_brep_file)
+
+    _validate_file_extension(input_step_file, (".stp", ".step"))
+    _validate_file_exists(input_step_file)
+    _validate_file_extension(output_brep_file, ".brep")
+
     occ_step_to_brep(
-        input_step_file,
-        output_brep_file,
-        minimum_volume=1,
-        check_geometry=True,
-        fix_geometry=False,
+        input_step_file.as_posix(),
+        output_brep_file.as_posix(),
+        minimum_volume=minimum_volume,
+        check_geometry=check_geometry,
+        fix_geometry=fix_geometry,
+        logging=extension_logging,
     )
-    return output_brep_file, [""]
+    return [""]
 
 
 def merge_brep_geometries(
-    input_brep_file, output_brep_file=None, tolerance: float = 0.001
-) -> str:
+    input_brep_file,
+    output_brep_file=None,
+    *,
+    dist_tolerance: float = 0.001,
+    extension_logging: bool = False,
+) -> None:
     """Merge vertices in a BREP file and save the result to a new BREP file"""
-    occ_merger(input_brep_file, output_brep_file, tolerance)
+    occ_merger(input_brep_file, output_brep_file, dist_tolerance)
 
 
 def facet_brep_to_dagmc(

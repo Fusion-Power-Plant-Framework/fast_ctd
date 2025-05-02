@@ -17,13 +17,26 @@
 #include "geometry.hpp"
 #include "utils.hpp"
 
-int occ_merger(std::string input_brep_file, std::string output_brep_file, double tolerance)
+int occ_merger(
+	std::string input_brep_file,
+	std::string output_brep_file,
+	double dist_tolerance,
+	bool logging)
 {
+	if (logging)
+	{
+		spdlog::set_level(spdlog::level::debug);
+	}
+	else
+	{
+		spdlog::set_level(spdlog::level::off);
+	}
+
 	spdlog::info("");
 	spdlog::info("Starting occ_merger:");
 	spdlog::info("  input_brep_file: {}", input_brep_file);
 	spdlog::info("  output_brep_file: {}", output_brep_file);
-	spdlog::info("  tolerance: {}", tolerance);
+	spdlog::info("  dist_tolerance: {}", dist_tolerance);
 	spdlog::info("");
 
 	document inp;
@@ -46,7 +59,7 @@ int occ_merger(std::string input_brep_file, std::string output_brep_file, double
 	{
 		spdlog::info("Merging shapes");
 
-		const auto result = salome_glue_shape(merged, tolerance);
+		const auto result = salome_glue_shape(merged, dist_tolerance);
 
 		if (result.IsNull())
 		{
@@ -75,7 +88,7 @@ int occ_merger(std::string input_brep_file, std::string output_brep_file, double
 		const double
 			v1 = volume_of_shape(inp.solid_shapes[i]),
 			v2 = volume_of_shape(out.solid_shapes[i]),
-			mn = std::min(v1, v2) * tolerance;
+			mn = std::min(v1, v2) * dist_tolerance;
 
 		if (std::fabs(v1 - v2) > mn)
 		{
