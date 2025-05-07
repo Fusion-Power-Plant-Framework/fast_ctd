@@ -18,6 +18,7 @@
 #include <TDocStd_Document.hxx>
 #include <TDataStd_Name.hxx>
 #include <TDataStd_TreeNode.hxx>
+#include <TCollection_AsciiString.hxx>
 
 #include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
@@ -27,7 +28,7 @@
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_CompSolid.hxx>
 
-#include <Quantity_PhysicalQuantity.hxx>
+#include <Units_Quantity.hxx>
 #include <Quantity_Color.hxx>
 
 #include <ShapeFix_Shape.hxx>

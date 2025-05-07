@@ -23,7 +23,7 @@ dependencies:
   - nanobind
   - spdlog=1.15.2
   - openmc>=0.14.0
-  - occt=7.6.3=all_h4c9f3c6_203
+  - occt>=7.9
   - pip
   - pip:
       - -e ../[dev]
