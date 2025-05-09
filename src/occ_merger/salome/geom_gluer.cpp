@@ -234,7 +234,7 @@ namespace
 		MultiShapeKey(const TopoDS_Shape &shape) : key{1}
 		{
 			key.Add(shape);
-			hashsum = (unsigned)shape.HashCode(INT_MAX);
+			hashsum += std::hash<TopoDS_Shape>{}(shape);
 		}
 
 		MultiShapeKey(const TopTools_ListOfShape &shapes) : key(shapes.Extent()), hashsum{0}
@@ -242,16 +242,31 @@ namespace
 			for (const auto &shape : shapes)
 			{
 				key.Add(shape);
-				hashsum += (unsigned)shape.HashCode(INT_MAX);
+				hashsum += std::hash<TopoDS_Shape>{}(shape);
 			}
 		}
 
 		struct Hasher
 		{
+
+			unsigned operator()(const MultiShapeKey &key) const noexcept {
+				return Hasher::HashCode(key);
+			}
+
+			unsigned operator()(const MultiShapeKey &key1, const MultiShapeKey &key2) const noexcept {
+				return Hasher::IsEqual(key1, key2);
+			}
+
 			static Standard_Integer HashCode(
 				const MultiShapeKey &key, const Standard_Integer upper)
 			{
-				return ::HashCode(key.hashsum, upper);
+				return std::hash<unsigned>{}(key.hashsum);
+			}
+
+			static Standard_Integer HashCode(
+				const MultiShapeKey &key)
+			{
+				return std::hash<unsigned>{}(key.hashsum);
 			}
 
 			static Standard_Boolean IsEqual(
