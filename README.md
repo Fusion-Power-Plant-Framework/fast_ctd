@@ -2,11 +2,7 @@
 
 This is a Python package for the fast conversion of STEP files to DAGMC models (.h5m files).
 
-## Installation
-
-todo
-
-## Local development and installation
+## Local install and build wheel
 
 Development of this package is done in a conda environment. To create the environment, run (replace `conda` with `mamba` if you use that):
 
@@ -28,6 +24,25 @@ then try running an example:
 cd examples
 python stp_to_dagmc_workflow.py
 ```
+
+With the correct conda environment activated, you can build the
+wheel file by:
+
+```bash
+ python -m build --config-setting=setup-args=-DPY_ENV_ROOT_PATH=$CONDA_PREFIX
+```
+
+### Installing the wheel in a different environment
+
+The fast_ctd package (the wheel) may be install, in other python environments, by:
+
+```bash
+pip install dist/fast_ctd-0.1.0-py3-none-any.whl
+```
+
+(with the intended python environment activated).
+
+## Local development
 
 ### Changing the C++ source
 
