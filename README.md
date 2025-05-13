@@ -1,6 +1,6 @@
-# fast_ctd
+# fast_ctd - Fast CAD to DAGMC
 
-This is a Python package for fast conversion of STEP files to DAGMC models (.h5m files).
+This is a Python package for the fast conversion of STEP files to DAGMC models (.h5m files).
 
 ## Installation
 
