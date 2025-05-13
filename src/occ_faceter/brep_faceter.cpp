@@ -292,9 +292,9 @@ void BrepFaceter::perform_faceting(const FacetingTolerance &facet_tol)
     // that can be used by the following serial code
     BRepMesh_IncrementalMesh(
         surfaceMap.FindKey(i),
-        facet_tol.tolerance,
+        facet_tol.lin_def_tol,
         facet_tol.is_relative,
-        0.5,
+        facet_tol.ang_def_tol,
         true);
   }
 }
@@ -459,7 +459,7 @@ void brep_faceter(std::string brep_file, std::string materials_list_file,
 
   MBTool mbtool;
   // TODO: review use of GEOMETRY_RESABS
-  mbtool.set_faceting_tol_tag(facet_tol.tolerance);
+  mbtool.set_faceting_tol_tag(facet_tol.lin_def_tol);
   mbtool.set_scale_factor(scale_factor);
 
   spdlog::info("Begin faceting");

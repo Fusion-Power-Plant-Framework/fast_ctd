@@ -15,6 +15,7 @@ void occ_faceter(std::string input_brep_file,
                  std::string materials_file,
                  double lin_deflection_tol,
                  bool tol_is_absolute,
+                 double ang_deflection_tol,
                  double scale_factor,
                  bool logging)
 {
@@ -34,14 +35,24 @@ void occ_faceter(std::string input_brep_file,
     spdlog::error("Input file path should end with .brep: {}", input_brep_file);
     std::exit(1);
   }
-
   if (!has_ending(output_h5m_file, ".h5m"))
   {
     spdlog::error("Output file path should end with .h5m: {}", output_h5m_file);
     std::exit(1);
   }
 
-  FacetingTolerance facet_tol(lin_deflection_tol, tol_is_absolute);
+  if (lin_deflection_tol < 0)
+  {
+    spdlog::error("Linear deflection tolerance ({}) should not be negative", lin_deflection_tol);
+    std::exit(1);
+  }
+  if (ang_deflection_tol < 0)
+  {
+    spdlog::error("Angular deflection tolerance ({}) should not be negative", ang_deflection_tol);
+    std::exit(1);
+  }
+
+  FacetingTolerance facet_tol(lin_deflection_tol, tol_is_absolute, ang_deflection_tol);
 
   spdlog::info("");
   spdlog::info("Starting occ_faceter:");
@@ -50,6 +61,7 @@ void occ_faceter(std::string input_brep_file,
   spdlog::info("  materials_file: {}", materials_file);
   spdlog::info("  lin_deflection_tol: {}", lin_deflection_tol);
   spdlog::info("  tol_is_absolute (false -> lin_deflection_tol is relative to the edge length): {}", tol_is_absolute);
+  spdlog::info("  ang_deflection_tol: {}", ang_deflection_tol);
   spdlog::info("  scale_factor: {}", scale_factor);
   spdlog::info("");
 

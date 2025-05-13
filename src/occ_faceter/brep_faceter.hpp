@@ -9,11 +9,12 @@
 
 struct FacetingTolerance
 {
-  float tolerance;
+  float lin_def_tol;
   bool is_relative;
+  float ang_def_tol;
 
-  FacetingTolerance(float tol, bool is_absolute = false)
-      : tolerance(tol), is_relative(!is_absolute) {}
+  FacetingTolerance(float lin_def_tol, bool is_absolute = false, float ang_def_tol = 0.5)
+      : lin_def_tol(lin_def_tol), is_relative(!is_absolute), ang_def_tol(ang_def_tol) {}
 };
 
 entity_vector sew_and_facet2(TopoDS_Shape &shape, const FacetingTolerance &facet_tol, MBTool &mbtool);

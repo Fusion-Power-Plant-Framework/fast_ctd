@@ -9,6 +9,7 @@ void occ_faceter(std::string input_brep_file,
                  std::string materials_file,
                  double lin_deflection_tol,
                  bool tol_is_absolute,
+                 double ang_deflection_tol,
                  double scale_factor,
                  bool logging);
 

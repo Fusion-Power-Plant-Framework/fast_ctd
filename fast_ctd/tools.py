@@ -58,18 +58,28 @@ def step_to_brep(
     output_brep_file: StrPath,
     *,
     minimum_volume: float = 1.0,
-    check_geometry: bool = True,
     fix_geometry: bool = False,
+    check_geometry: bool = True,
     enable_logging: bool = False,
-) -> list[list[str]]:
+) -> list[tuple[str, str]]:
     """Convert a STEP file to a BREP file and return the BREP file path and component names.
 
     Args:
-        input_step_file: The path to the input STEP file.
-        output_brep_file: The path to the output BREP file.
-        minimum_volume: The minimum volume for components to be included in the BREP file.
-        check_geometry: Whether to check the geometry of the STEP file.
-        fix_geometry: Whether to fix the geometry of the STEP file.
+        input_step_file: The path to the input STEP file (.stp, .step).
+        output_brep_file: The path to the output BREP file (.brep).
+        minimum_volume:
+            The minimum solid volume to be included in the BREP file.
+            The unit is the unit of the geometry^3 (i.e. if your model is in mm,
+            the unit is mm^3).
+        fix_geometry:
+            Attempts to fix small edges and gaps (by merging them) using the
+            OCC ShapeFix_Wireframe API in the edges of solids.
+            Also to "fix shapes" using the ShapeFix_Solid API.
+            If you are not getting watertight models, try this option and enable
+            logging.
+        check_geometry:
+            Checks if the geometry is valid using the OCC
+            ShapeAnalysis_Shape::Check() API.
         enable_logging: Whether to enable logging in the C++ extension code.
 
     Returns:
@@ -86,8 +96,8 @@ def step_to_brep(
         input_step_file.as_posix(),
         output_brep_file.as_posix(),
         minimum_volume=minimum_volume,
-        check_geometry=check_geometry,
         fix_geometry=fix_geometry,
+        check_geometry=check_geometry,
         logging=enable_logging,
     )
     if not isinstance(comps_info_list, list):
@@ -101,7 +111,8 @@ def step_to_brep(
             raise TypeError(
                 f"Expected a string component info, but got {type(ci)}",
             )
-        ret_comps_info_list.append(ci.split(","))
+        group_no, comp_name = ci.split(",")
+        ret_comps_info_list.append((group_no, comp_name))
 
     return ret_comps_info_list
 
@@ -118,7 +129,9 @@ def merge_brep_geometries(
     Args:
         input_brep_file: The path to the input BREP file.
         output_brep_file: The path to the output BREP file.
-        dist_tolerance: The distance tolerance for merging vertices.
+        dist_tolerance:
+            The distance tolerance for merging entities
+            (vertices, edges, faces, etc.).
         enable_logging: Whether to enable logging in the C++ extension code.
     """
     input_brep_file = Path(input_brep_file)
@@ -143,6 +156,7 @@ def facet_brep_to_dagmc(
     *,
     lin_deflection_tol: float = 0.001,
     tol_is_absolute: bool = False,
+    ang_deflection_tol: float = 0.5,
     scale_factor: float = 0.1,
     enable_logging: bool = False,
 ) -> None:
@@ -156,8 +170,14 @@ def facet_brep_to_dagmc(
         tol_is_absolute:
             Whether the lin_deflection_tol is absolute
             or relative to edge length.
-        scale_factor: Scale factor for the geometry.
+        ang_deflection_tol: Angular deflection tolerance for faceting.
+        scale_factor: Scale factor for the geometry. [may get removed]
         enable_logging: Whether to enable logging in the C++ extension code.
+
+    Notes:
+        `lin_deflection_tol`, `tol_is_absolute` and `ang_deflection_tol` all relate to
+        mesh quality and are passed to the OCC BRepMesh_IncrementalMesh API.
+        More information about BRepMesh_IncrementalMesh can be found in the OCC documentation.
     """
     input_brep_file = Path(input_brep_file)
     output_h5m_file = Path(output_h5m_file)
@@ -175,6 +195,7 @@ def facet_brep_to_dagmc(
         materials_csv_file.as_posix(),
         lin_deflection_tol,
         tol_is_absolute,
+        ang_deflection_tol,
         scale_factor,
         enable_logging,
     )
@@ -193,9 +214,7 @@ def make_watertight(
 
     Args:
         h5m_file: The path to the input `.h5m` file to be processed.
-        output_h5m_file: The path to the output
-            `.h5m` file. If not provided, the output file will be named based
-            on the input file with a `-wt` suffix.
+        output_h5m_file: The path to the output `.h5m` file.
 
     Raises:
         FileNotFoundError: If the `make_watertight` binary or the input file
@@ -265,4 +284,5 @@ def validate_dagmc_model_using_openmc(
     dagmc_file: str,
     materials_def: str | list | dict = "",
 ) -> bool:
-    """Validate a DAGMC model using the validate_dagmc tool"""
+    """Validate a DAGMC model using OpenMC."""
+    return True

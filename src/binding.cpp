@@ -36,6 +36,7 @@ NB_MODULE(fast_ctd_ext, m)
             nb::arg("materials_file"),
             nb::arg("lin_deflection_tol"),
             nb::arg("tol_is_absolute"),
+            nb::arg("ang_deflection_tol"),
             nb::arg("scale_factor"),
             nb::arg("logging") = false);
 }
