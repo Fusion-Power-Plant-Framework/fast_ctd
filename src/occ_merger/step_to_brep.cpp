@@ -405,28 +405,28 @@ std::vector<std::string> occ_step_to_brep(
 	spdlog::info("  fix_geometry: {}", fix_geometry);
 	spdlog::info("");
 
-	collector doc(minimum_volume);
-	load_step_file(input_step_file.c_str(), doc);
+	collector col(minimum_volume);
+	load_step_file(input_step_file.c_str(), col);
 
-	doc.log_summary();
+	col.log_summary();
 
 	if (fix_geometry)
 	{
 		spdlog::debug("fixing wireframes");
-		doc.fix_wireframes(0.01, 0.00001);
+		col.fix_wireframes(0.01, 0.00001);
 		spdlog::debug("fixing shapes");
-		doc.fix_shapes(0.01, 0.00001);
+		col.fix_shapes(0.01, 0.00001);
 	}
 
 	if (check_geometry)
 	{
 		spdlog::debug("Checking geometry");
-		doc.validate_geometry();
+		col.validate_geometry();
 	}
 
 	spdlog::info("writing brep file {}", output_brep_file);
 
-	doc.write_brep_file(output_brep_file.c_str());
+	col.write_brep_file(output_brep_file.c_str());
 
-	return doc.get_added_comps_info();
+	return col.get_added_comps_info();
 }

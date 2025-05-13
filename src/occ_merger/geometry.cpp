@@ -38,6 +38,45 @@
 #include "geometry.hpp"
 #include "utils.hpp"
 
+// annoying logging stuff
+
+std::ostream &
+operator<<(std::ostream &str, TopAbs_ShapeEnum type)
+{
+	const char *name = "unknown";
+	switch (type)
+	{
+	case TopAbs_COMPOUND:
+		name = "COMPOUND";
+		break;
+	case TopAbs_COMPSOLID:
+		name = "COMPSOLID";
+		break;
+	case TopAbs_SOLID:
+		name = "SOLID";
+		break;
+	case TopAbs_SHELL:
+		name = "SHELL";
+		break;
+	case TopAbs_FACE:
+		name = "FACE";
+		break;
+	case TopAbs_WIRE:
+		name = "WIRE";
+		break;
+	case TopAbs_EDGE:
+		name = "EDGE";
+		break;
+	case TopAbs_VERTEX:
+		name = "VERTEX";
+		break;
+	case TopAbs_SHAPE:
+		name = "SHAPE";
+		break;
+	}
+	return str << name;
+}
+
 std::string
 operator<<(const char *str, TopAbs_ShapeEnum type)
 {
@@ -197,6 +236,7 @@ operator<<(std::ostream &str, BRepCheck_Status status)
 	}
 	return str << name;
 }
+// annoying logging stuff - end
 
 static double
 volume_of_shape_maybe_neg(const TopoDS_Shape &shape)
@@ -323,19 +363,23 @@ is_shape_valid(int i, const TopoDS_Shape &shape)
 		return true;
 	}
 
+	std::ostringstream log;
+	log << "shape " << i << " has " << shape.ShapeType()
+		<< " and contains following errors:\n";
+
 	std::map<BRepCheck_Status, int> stats;
 	report_analyzer_status(checker, shape, stats);
 	for (const auto pair : stats)
 	{
 		if (pair.first != BRepCheck_NoError)
 		{
-			// spdlog::warn(
-			// 	"shape {} has {} errors: {} times {}",
-			// 	i,
-			// 	shape.ShapeType(),
-			// 	pair.first, pair.second);
+			log << ' ' << pair.first << ' ' << pair.second << " times";
 		}
 	}
+
+	log << "\n";
+
+	spdlog::warn(log.str());
 
 	return false;
 }

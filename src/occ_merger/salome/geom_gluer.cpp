@@ -75,6 +75,8 @@
 #include <GeomAPI_ProjectPointOnSurf.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
 
+#include <spdlog/spdlog.h>
+
 #include "geom_gluer.hxx"
 
 // unnamed namespace for internal linkage
@@ -249,11 +251,13 @@ namespace
 		struct Hasher
 		{
 
-			unsigned operator()(const MultiShapeKey &key) const noexcept {
+			unsigned operator()(const MultiShapeKey &key) const noexcept
+			{
 				return Hasher::HashCode(key);
 			}
 
-			unsigned operator()(const MultiShapeKey &key1, const MultiShapeKey &key2) const noexcept {
+			unsigned operator()(const MultiShapeKey &key1, const MultiShapeKey &key2) const noexcept
+			{
 				return Hasher::IsEqual(key1, key2);
 			}
 
@@ -327,7 +331,6 @@ namespace
 		}
 			// must be an EDGE or FACE at the moment
 		default:
-			// LOG(ERROR) << "PointOnShape passed: " << shape.ShapeType() << '\n';
 			throw std::runtime_error("shape is neither an EDGE nor FACE");
 		}
 	}
@@ -688,13 +691,8 @@ namespace
 
 			// perform detection
 			DetectVertices();
-			// LOG(TRACE) << "DetectVertices done\n";
-
 			DetectShapes(TopAbs_EDGE);
-			// LOG(TRACE) << "DetectShapes(EDGE) done\n";
-
 			DetectShapes(TopAbs_FACE);
-			// LOG(TRACE) << "DetectShapes(FACE) done\n";
 		}
 
 		const TopTools_DataMapOfShapeListOfShape &Images() { return myImages; }
@@ -873,12 +871,11 @@ namespace
 				coincident_shapes.Add(aPKF, aLSDF);
 			}
 		}
-		// LOG(TRACE) << "before RefineCoincidentShapes!\n";
+
 		// check geometric coincidence, note this ~50% of total execution time for
 		// me
 		merger.RefineCoincidentShapes(coincident_shapes);
-		// LOG(TRACE) << "after RefineCoincidentShapes!\n";
-		//
+
 		// Images/Origins
 		for (CoincidentShapeList::Iterator it{coincident_shapes}; it.More(); it.Next())
 		{
@@ -996,7 +993,7 @@ namespace
 
 		if (!myImagesToWork.Extent())
 		{
-			// LOG(WARNING) << "no shapes to glue detected\n";
+			spdlog::warn("no shapes to glue detected");
 			return myArgument;
 		}
 
@@ -1010,27 +1007,18 @@ namespace
 			}
 		}
 
-		// LOG(TRACE) << "images and work assembled";
 		FillVertices();
-		// LOG(TRACE) << "FillVertices done\n";
 		FillBRepShapes(TopAbs_EDGE);
-		// LOG(TRACE) << "FillBRepShapes(EDGE) done\n";
 		FillContainers(TopAbs_WIRE);
-		// LOG(TRACE) << "FillContainers(WIRE) done\n";
 		FillBRepShapes(TopAbs_FACE);
-		// LOG(TRACE) << "FillBRepShapes(FACE) done\n";
 		FillContainers(TopAbs_SHELL);
-		// LOG(TRACE) << "FillContainers(SHELL) done\n";
 		FillContainers(TopAbs_SOLID);
-		// LOG(TRACE) << "FillContainers(SOLID) done\n";
 		FillContainers(TopAbs_COMPSOLID);
-		// LOG(TRACE) << "FillContainers(COMPSOLID) done\n";
 		FillCompounds();
-		// LOG(TRACE) << "FillCompounds done\n";
+
 		auto result = BuildResult();
-		// LOG(TRACE) << "BuildResult done\n";
 		BRepLib::SameParameter(result, tolerance, Standard_True);
-		// LOG(TRACE) << "SameParameter done\n";
+
 		return result;
 	}
 
@@ -1357,9 +1345,12 @@ salome_glue_shape(const TopoDS_Shape &shape, Standard_Real tolerance)
 		geomgluer2 gluer(shape);
 		return gluer.Perform(tolerance);
 	}
+
 	catch (std::exception &err)
 	{
-		// LOG(FATAL) << "failed to glue shapes: " << err.what() << '\n';
+
+		spdlog::error(
+			"failed to glue shapes: {}", err.what());
 		std::exit(1);
 	}
 }

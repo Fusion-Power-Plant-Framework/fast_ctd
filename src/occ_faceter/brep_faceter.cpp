@@ -290,7 +290,12 @@ void BrepFaceter::perform_faceting(const FacetingTolerance &facet_tol)
   {
     // This constructor calls Perform() to mutate the face adding triangulation
     // that can be used by the following serial code
-    BRepMesh_IncrementalMesh(surfaceMap.FindKey(i), facet_tol.tolerance, facet_tol.is_relative, 0.5);
+    BRepMesh_IncrementalMesh(
+        surfaceMap.FindKey(i),
+        facet_tol.tolerance,
+        facet_tol.is_relative,
+        0.5,
+        true);
   }
 }
 
