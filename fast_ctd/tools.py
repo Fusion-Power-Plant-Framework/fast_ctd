@@ -11,6 +11,7 @@ from pathlib import Path
 from fast_ctd_ext import occ_faceter, occ_merger, occ_step_to_brep
 
 from fast_ctd.logging import log_info, log_warn
+from fast_ctd.utils import none_guard, validate_file_exists, validate_file_extension
 
 try:
     import openmc
@@ -19,38 +20,12 @@ except ImportError:
 
 StrPath = str | Path
 
-
 # todo:
 # - add ests
 # - add a README.md with usage examples
 # - add openmc validation work
 # - stub file generation and installing from nanobind: python -m nanobind.stubgen -m fast_ctd_ext -M py.typed
 # - versioning the project with pyproject.toml and meson project version https://github.com/mesonbuild/meson/issues/688S
-
-
-def _validate_file_extension(
-    file_path: Path,
-    expected_extension: str | tuple[str],
-) -> None:
-    """Validate the file extension of a given file path."""
-    expected_extension = (
-        (expected_extension,)
-        if isinstance(expected_extension, str)
-        else expected_extension
-    )
-    if file_path.suffix not in expected_extension:
-        raise ValueError(
-            f"File must be one of {expected_extension}, but got {file_path.suffix}",
-        )
-
-
-def _validate_file_exists(
-    file_path: Path,
-    suffix_stmt: str = "Are you in the right directory?",
-) -> None:
-    """Validate if a file exists."""
-    if not file_path.exists():
-        raise FileNotFoundError(f"'{file_path}' does not exist. {suffix_stmt}")
 
 
 def step_to_brep(
@@ -88,9 +63,13 @@ def step_to_brep(
     input_step_file = Path(input_step_file)
     output_brep_file = Path(output_brep_file)
 
-    _validate_file_extension(input_step_file, (".stp", ".step"))
-    _validate_file_exists(input_step_file)
-    _validate_file_extension(output_brep_file, ".brep")
+    validate_file_extension(input_step_file, (".stp", ".step"))
+    validate_file_exists(input_step_file)
+    validate_file_extension(output_brep_file, ".brep")
+
+    minimum_volume = none_guard(minimum_volume, 1.0)
+    fix_geometry = none_guard(fix_geometry, False)  # noqa: FBT003
+    check_geometry = none_guard(check_geometry, True)  # noqa: FBT003
 
     comps_info_list = occ_step_to_brep(
         input_step_file.as_posix(),
@@ -137,9 +116,11 @@ def merge_brep_geometries(
     input_brep_file = Path(input_brep_file)
     output_brep_file = Path(output_brep_file)
 
-    _validate_file_extension(input_brep_file, ".brep")
-    _validate_file_exists(input_brep_file)
-    _validate_file_extension(output_brep_file, ".brep")
+    validate_file_extension(input_brep_file, ".brep")
+    validate_file_exists(input_brep_file)
+    validate_file_extension(output_brep_file, ".brep")
+
+    dist_tolerance = none_guard(dist_tolerance, 0.001)
 
     occ_merger(
         input_brep_file.as_posix(),
@@ -183,11 +164,16 @@ def facet_brep_to_dagmc(
     output_h5m_file = Path(output_h5m_file)
     materials_csv_file = Path(materials_csv_file)
 
-    _validate_file_extension(input_brep_file, ".brep")
-    _validate_file_exists(input_brep_file)
-    _validate_file_extension(output_h5m_file, ".h5m")
-    _validate_file_extension(materials_csv_file, ".csv")
-    _validate_file_exists(materials_csv_file)
+    validate_file_extension(input_brep_file, ".brep")
+    validate_file_exists(input_brep_file)
+    validate_file_extension(output_h5m_file, ".h5m")
+    validate_file_extension(materials_csv_file, ".csv")
+    validate_file_exists(materials_csv_file)
+
+    lin_deflection_tol = none_guard(lin_deflection_tol, 0.001)
+    tol_is_absolute = none_guard(tol_is_absolute, False)  # noqa: FBT003
+    ang_deflection_tol = none_guard(ang_deflection_tol, 0.5)
+    scale_factor = none_guard(scale_factor, 0.1)
 
     occ_faceter(
         input_brep_file.as_posix(),
@@ -227,13 +213,13 @@ def make_watertight(
     h5m_file = Path(h5m_file)
     output_h5m_file = Path(output_h5m_file)
 
-    _validate_file_exists(
+    validate_file_exists(
         make_watertight_bin_path,
         "Is DAGMC/OpenMC (with DAGMC) installed in your Python env?",
     )
-    _validate_file_extension(h5m_file, ".h5m")
-    _validate_file_exists(h5m_file)
-    _validate_file_extension(output_h5m_file, ".h5m")
+    validate_file_extension(h5m_file, ".h5m")
+    validate_file_exists(h5m_file)
+    validate_file_extension(output_h5m_file, ".h5m")
 
     make_watertight = sp.run(  # noqa: S603
         [

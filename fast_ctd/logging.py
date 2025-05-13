@@ -1,3 +1,5 @@
+"""Logging functions and configuration for fast_ctd."""
+
 import logging
 from typing import Any
 

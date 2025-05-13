@@ -20,6 +20,7 @@ comps_info = step_to_brep(
     input_stp_file,
     brep_file,
     enable_logging=True,
+    minimum_volume=None,
 )
 merge_brep_geometries(
     brep_file,
