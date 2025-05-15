@@ -1,4 +1,8 @@
+"""The fast_ctd package."""
+
 from fast_ctd.tools import (
+    check_watertight,
+    decode_tightness_checks,
     facet_brep_to_dagmc,
     make_watertight,
     merge_brep_geometries,
@@ -7,9 +11,11 @@ from fast_ctd.tools import (
 )
 
 __all__ = [
+    "check_watertight",
+    "decode_tightness_checks",
     "facet_brep_to_dagmc",
+    "make_watertight",
     "merge_brep_geometries",
     "step_to_brep",
-    "make_watertight",
     "validate_dagmc_model_using_openmc",
 ]

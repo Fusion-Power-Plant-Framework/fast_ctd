@@ -10,7 +10,6 @@ from pathlib import Path
 
 from fast_ctd_ext import occ_faceter, occ_merger, occ_step_to_brep
 
-from fast_ctd.logging import log_info, log_warn
 from fast_ctd.utils import none_guard, validate_file_exists, validate_file_extension
 
 try:
@@ -188,9 +187,8 @@ def facet_brep_to_dagmc(
 
 
 def make_watertight(
-    h5m_file: StrPath,
-    output_h5m_file: StrPath,
-) -> None:
+    h5m_file: StrPath, output_h5m_file: StrPath
+) -> sp.CompletedProcess[str]:
     """Make a geometry watertight using the make_watertight tool.
 
     This function utilizes the `make_watertight` from tool from DAGMC
@@ -206,8 +204,6 @@ def make_watertight(
         FileNotFoundError: If the `make_watertight` binary or the input file
             does not exist.
         ValueError: If the input or output file does not have a `.h5m` extension.
-        subprocess.CalledProcessError: If the `make_watertight` tool fails to
-            execute successfully.
     """
     make_watertight_bin_path = Path(sys.executable).parent / "make_watertight"
     h5m_file = Path(h5m_file)
@@ -221,49 +217,123 @@ def make_watertight(
     validate_file_exists(h5m_file)
     validate_file_extension(output_h5m_file, ".h5m")
 
-    make_watertight = sp.run(  # noqa: S603
+    return sp.run(  # noqa: S603
         [
             make_watertight_bin_path.as_posix(),
             h5m_file.as_posix(),
             "-o",
             output_h5m_file.as_posix(),
         ],
-        check=True,
+        check=False,
+        text=True,
         capture_output=True,
     )
 
-    # Extract percentage values from the stdout
-    # they come from check_watertight, run at the end of make_watertight
-    mw_std_o = make_watertight.stdout.decode()
-    percentages = re.findall(r"(\d+\.\d+|\d+)%", mw_std_o)
-    percentages = [float(p) for p in percentages]
 
-    if all(int(p) == 0 if p.is_integer() else False for p in percentages):
-        log_info(
-            "make_watertight finished successfully, with check_watertight showing no leaky volumes.",
-            more_info={"output_file": output_h5m_file},
-        )
-    else:
-        stout_log_dump_path = h5m_file.with_name(
-            f"{h5m_file.stem}-make_watertight.stdout.txt",
-        )
-        sterr_log_dump_path = h5m_file.with_name(
-            f"{h5m_file.stem}-make_watertight.stderr.txt",
-        )
-        with stout_log_dump_path.open("w") as log_dump:
-            log_dump.write(mw_std_o)
-        with sterr_log_dump_path.open("w") as log_dump:
-            log_dump.write(make_watertight.stderr.decode())
+def check_watertight(
+    h5m_file: StrPath, tolerance: float | None = None
+) -> sp.CompletedProcess[str]:
+    """Check if a geometry is watertight using the check_watertight tool.
 
-        log_warn(
-            "make_watertight finished successfully, but the model is not watertight. "
-            "Check log files for further details.",
-            more_info={
-                "output_file": output_h5m_file,
-                "stout_log": stout_log_dump_path,
-                "sterr_log": sterr_log_dump_path,
-            },
-        )
+    This function utilizes the `check_watertight` from tool from DAGMC
+    to process a given `.h5m` and check if the geometry is watertight.
+
+    Args:
+        h5m_file: The path to the input `.h5m` file to be processed.
+        tolerance: The tolerance for the check. If None, the default value is used.
+
+    Returns:
+        A subprocess.CompletedProcess object containing the result of the command.
+
+    Raises:
+        FileNotFoundError: If the `check_watertight` binary or the input file
+            does not exist.
+        ValueError: If the input file does not have a `.h5m` extension.
+    """
+    check_watertight_bin_path = Path(sys.executable).parent / "check_watertight"
+
+    h5m_file = Path(h5m_file)
+
+    validate_file_exists(
+        check_watertight_bin_path,
+        "Is DAGMC/OpenMC (with DAGMC) installed in your Python env?",
+    )
+    validate_file_extension(h5m_file, ".h5m")
+    validate_file_exists(h5m_file)
+
+    cmds = [check_watertight_bin_path.as_posix(), "-o", h5m_file.as_posix()]
+    if tolerance is not None:
+        cmds.extend(["-t", str(tolerance)])
+
+    return sp.run(  # noqa: S603
+        cmds,
+        check=False,
+        text=True,
+        capture_output=True,
+    )
+
+
+def decode_tightness_checks(stdout: str) -> list[float | int] | None:
+    """Decode the stdout of the check_watertight/make_watertight subprocess.
+
+    Args:
+        stdout: The stdout of the subprocess.
+
+    Returns:
+        A list of floats or ints representing the percentage values.
+        None if the output is empty or does not contain any decodable values.
+    """
+    percentages = re.findall(r"(\d+\.\d+|\d+)%", stdout)
+    try:
+        percentages = [float(p) for p in percentages]
+    except ValueError:
+        return None
+    return [int(p) if p.is_integer() else p for p in percentages]
+
+
+def mbconvert_vtk(
+    h5m_file: StrPath,
+    output_vtk_file: StrPath,
+) -> sp.CompletedProcess[str]:
+    """Convert a MOAB file to a VTK file using the mbconvert tool.
+
+    Args:
+        h5m_file: The path to the input `.h5m` file to be processed.
+        output_vtk_file: The path to the output `.vtk` file.
+
+    Raises:
+        FileNotFoundError: If the `mbconvert` binary or the input file
+            does not exist.
+        ValueError: If the input or output file does not have a `.h5m` or `.vtk` extension.
+
+    Notes:
+        The `mbconvert` tool can convert between various file formats,
+        run `mbconvert -l` to list the supported formats manually.
+    """
+    mbconvert_bin_path = Path(sys.executable).parent / "mbconvert"
+    h5m_file = Path(h5m_file)
+    output_vtk_file = Path(output_vtk_file)
+
+    validate_file_exists(
+        mbconvert_bin_path,
+        "Is DAGMC/OpenMC (with DAGMC) installed in your Python env?",
+    )
+    validate_file_extension(h5m_file, ".h5m")
+    validate_file_exists(h5m_file)
+    validate_file_extension(output_vtk_file, ".vtk")
+
+    return sp.run(  # noqa: S603
+        [
+            mbconvert_bin_path.as_posix(),
+            h5m_file.as_posix(),
+            "-f",
+            "vtk",
+            output_vtk_file.as_posix(),
+        ],
+        check=False,
+        text=True,
+        capture_output=True,
+    )
 
 
 def validate_dagmc_model_using_openmc(

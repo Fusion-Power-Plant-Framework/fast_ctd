@@ -79,8 +79,7 @@ py.install_sources(
   [
     'fast_ctd/__init__.py',
     'fast_ctd/tools.py',
-    'fast_ctd/logging.py',
-    'fast_ctd/utils.py'
+    'fast_ctd/utils.py',
   ],
   subdir: 'fast_ctd',
 )

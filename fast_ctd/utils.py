@@ -9,14 +9,14 @@ T = TypeVar("T")
 def none_guard(
     value: T | None,
     default: T,
-) -> None:
+) -> T:
     """Return the default value if the input is None, otherwise return the input value."""
     return default if value is None else value
 
 
 def validate_file_extension(
     file_path: Path,
-    expected_extension: str | tuple[str],
+    expected_extension: str | tuple[str, ...],
 ) -> None:
     """Validate the file extension of a given file path."""
     expected_extension = (
