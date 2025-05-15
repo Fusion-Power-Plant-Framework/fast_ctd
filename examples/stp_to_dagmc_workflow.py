@@ -1,10 +1,10 @@
 """An example of a workflow to convert a STEP file to a DAGMC file using fast_ctd."""
 
 from fast_ctd import (
+    dagmc_to_vtk,
     decode_tightness_checks,
     facet_brep_to_dagmc,
     make_watertight,
-    mbconvert_vtk,
     merge_brep_geometries,
     step_to_brep,
 )
@@ -54,7 +54,7 @@ else:
     print(wt.stderr)
 
 print("Creating VTK model - view in Paraview")
-mbc = mbconvert_vtk(output_wt_dagmc_file, output_dagmc_vtk_file)
+mbc = dagmc_to_vtk(output_wt_dagmc_file, output_dagmc_vtk_file)
 
 # Validate DAGMC model using OpenMC
 

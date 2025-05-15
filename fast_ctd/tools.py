@@ -293,11 +293,11 @@ def decode_tightness_checks(stdout: str) -> list[float | int] | None:
     return [int(p) if p.is_integer() else p for p in percentages]
 
 
-def mbconvert_vtk(
+def dagmc_to_vtk(
     h5m_file: StrPath,
     output_vtk_file: StrPath,
 ) -> sp.CompletedProcess[str]:
-    """Convert a MOAB file to a VTK file using the mbconvert tool.
+    """Convert a MOAB DAGMC .h5m file to a .vtk file using the `mbconvert` tool.
 
     Args:
         h5m_file: The path to the input `.h5m` file to be processed.
