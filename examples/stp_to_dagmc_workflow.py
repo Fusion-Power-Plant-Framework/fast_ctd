@@ -1,12 +1,13 @@
 """An example of a workflow to convert a STEP file to a DAGMC file using fast_ctd."""
 
 from fast_ctd import (
+    decode_tightness_checks,
     facet_brep_to_dagmc,
     make_watertight,
+    mbconvert_vtk,
     merge_brep_geometries,
     step_to_brep,
 )
-from fast_ctd.tools import decode_tightness_checks, mbconvert_vtk
 
 input_stp_file = "data/EUDEMO.stp"
 brep_file = "data/EUDEMO.brep"
@@ -41,7 +42,6 @@ facet_brep_to_dagmc(
 
 print("Running make_watertight")
 wt = make_watertight(output_dagmc_file, output_wt_dagmc_file)
-wt.check_returncode()
 percentages = decode_tightness_checks(wt.stdout)
 if percentages:
     all_zeros = all(p == 0 for p in percentages)
@@ -55,7 +55,6 @@ else:
 
 print("Creating VTK model - view in Paraview")
 mbc = mbconvert_vtk(output_wt_dagmc_file, output_dagmc_vtk_file)
-mbc.check_returncode()
 
 # Validate DAGMC model using OpenMC
 

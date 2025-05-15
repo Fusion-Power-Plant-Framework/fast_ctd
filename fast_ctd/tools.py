@@ -204,6 +204,7 @@ def make_watertight(
         FileNotFoundError: If the `make_watertight` binary or the input file
             does not exist.
         ValueError: If the input or output file does not have a `.h5m` extension.
+        CalledProcessError: If the `make_watertight` command fails.
     """
     make_watertight_bin_path = Path(sys.executable).parent / "make_watertight"
     h5m_file = Path(h5m_file)
@@ -249,6 +250,7 @@ def check_watertight(
         FileNotFoundError: If the `check_watertight` binary or the input file
             does not exist.
         ValueError: If the input file does not have a `.h5m` extension.
+        CalledProcessError: If the `check_watertight` command fails.
     """
     check_watertight_bin_path = Path(sys.executable).parent / "check_watertight"
 
@@ -305,6 +307,7 @@ def mbconvert_vtk(
         FileNotFoundError: If the `mbconvert` binary or the input file
             does not exist.
         ValueError: If the input or output file does not have a `.h5m` or `.vtk` extension.
+        CalledProcessError: If the `mbconvert` command fails.
 
     Notes:
         The `mbconvert` tool can convert between various file formats,
@@ -330,7 +333,7 @@ def mbconvert_vtk(
             "vtk",
             output_vtk_file.as_posix(),
         ],
-        check=False,
+        check=True,
         text=True,
         capture_output=True,
     )
