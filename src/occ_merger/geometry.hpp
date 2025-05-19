@@ -7,21 +7,21 @@
 #include <BRepCheck_Status.hxx>
 #include <BRepAlgoAPI_BooleanOperation.hxx>
 
+std::ostream &operator<<(std::ostream &str, TopAbs_ShapeEnum type);
+std::ostream &operator<<(std::ostream &str, BRepCheck_Status type);
 
-std::ostream& operator<<(std::ostream& str, TopAbs_ShapeEnum type);
-std::ostream& operator<<(std::ostream& str, BRepCheck_Status type);
+double volume_of_shape(const class TopoDS_Shape &shape);
+double distance_between_shapes(const TopoDS_Shape &a, const TopoDS_Shape &b);
 
-
-double volume_of_shape(const class TopoDS_Shape& shape);
-double distance_between_shapes(const TopoDS_Shape& a, const TopoDS_Shape& b);
-
-struct document {
+struct document
+{
 	std::vector<TopoDS_Shape> solid_shapes;
+	std::vector<std::string> solid_labels;
 
 	// these just exit on error, will do something better when it's clear what
 	// that is!
-	void load_brep_file(const char* path);
-	void write_brep_file(const char* path) const;
+	void load_brep_file(const char *path);
+	void write_brep_file(const char *path) const;
 
 	size_t count_invalid_shapes() const;
 
@@ -36,25 +36,27 @@ class boolean_op : public BRepAlgoAPI_BooleanOperation
 public:
 	boolean_op(
 		const BOPAlgo_Operation op,
-		const TopoDS_Shape& shape,
-		const TopoDS_Shape& tool) {
+		const TopoDS_Shape &shape,
+		const TopoDS_Shape &tool)
+	{
 		init(op, shape, tool);
 	}
 
 	boolean_op(
-		const BOPAlgo_PaveFiller& pf,
+		const BOPAlgo_PaveFiller &pf,
 		const BOPAlgo_Operation op,
-		const TopoDS_Shape& shape,
-		const TopoDS_Shape& tool) :
-		BRepAlgoAPI_BooleanOperation{pf} {
+		const TopoDS_Shape &shape,
+		const TopoDS_Shape &tool) : BRepAlgoAPI_BooleanOperation{pf}
+	{
 		init(op, shape, tool);
 	};
 
 protected:
 	void init(
 		const BOPAlgo_Operation op,
-		const TopoDS_Shape& shape,
-		const TopoDS_Shape& tool)	{
+		const TopoDS_Shape &shape,
+		const TopoDS_Shape &tool)
+	{
 		myOperation = op;
 		myArguments.Append(shape);
 		myTools.Append(tool);
@@ -64,7 +66,8 @@ protected:
 };
 
 // note that these are all subect to fuzzy tolerance
-enum class intersect_status {
+enum class intersect_status
+{
 	// something failed within OCCT, a different fuzzy value might help
 	failed,
 
@@ -81,7 +84,8 @@ enum class intersect_status {
 	overlap,
 };
 
-struct intersect_result {
+struct intersect_result
+{
 	intersect_status status;
 
 	// the minimum fuzzy value is 1e-9, this reports the correct value if
@@ -100,12 +104,12 @@ struct intersect_result {
 
 // pave time of zero disables timeout handling
 intersect_result classify_solid_intersection(
-	const TopoDS_Shape& shape, const TopoDS_Shape& tool,
+	const TopoDS_Shape &shape, const TopoDS_Shape &tool,
 	double fuzzy_value, unsigned pave_time_millisecs,
 	const char *msg);
 
-
-enum class imprint_status {
+enum class imprint_status
+{
 	// something failed within OCCT, using a different fuzzy value might help
 	failed,
 
@@ -117,7 +121,8 @@ enum class imprint_status {
 	merge_into_tool,
 };
 
-struct imprint_result {
+struct imprint_result
+{
 	imprint_status status;
 
 	double fuzzy_value;
@@ -135,4 +140,4 @@ struct imprint_result {
 };
 
 imprint_result perform_solid_imprinting(
-	const TopoDS_Shape& shape, const TopoDS_Shape& tool, double fuzzy_value);
+	const TopoDS_Shape &shape, const TopoDS_Shape &tool, double fuzzy_value);

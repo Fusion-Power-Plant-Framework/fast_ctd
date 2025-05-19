@@ -183,6 +183,7 @@ class collector
 			}
 
 			doc.solid_shapes.emplace_back(shape);
+			doc.solid_labels.emplace_back(label_name);
 
 			added_comps_info.push_back(
 				std::to_string(n_groups) + ',' + label_name);

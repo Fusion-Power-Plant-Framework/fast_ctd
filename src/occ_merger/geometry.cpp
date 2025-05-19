@@ -292,7 +292,7 @@ void document::load_brep_file(const char *path)
 
 	default:
 		spdlog::error(
-			"expected to get COMPOUND or COMPSOLID toplevel shape from brep file, not ");
+			"expected to get COMPOUND or COMPSOLID toplevel shape from brep file, not " << shape.ShapeType());
 		std::exit(1);
 	}
 	solid_shapes.reserve((size_t)shape.NbChildren());
@@ -309,7 +309,7 @@ void document::load_brep_file(const char *path)
 			break;
 		default:
 			spdlog::error(
-				"expecting shape to be a COMPSOLID or SOLID, not "
+				"expecting shape to be a COMPOUND, COMPSOLID or SOLID, not "
 				"{}\n",
 				" " << shp.ShapeType());
 			std::exit(1);
@@ -355,7 +355,7 @@ report_analyzer_status(
 }
 
 static bool
-is_shape_valid(int i, const TopoDS_Shape &shape)
+is_shape_valid(int i, const std::string label, const TopoDS_Shape &shape)
 {
 	BRepCheck_Analyzer checker{shape};
 	if (checker.IsValid())
@@ -364,7 +364,7 @@ is_shape_valid(int i, const TopoDS_Shape &shape)
 	}
 
 	std::ostringstream log;
-	log << "shape " << i << " has " << shape.ShapeType()
+	log << "shape " << i << " (" << label << ")" << " is " << shape.ShapeType()
 		<< " and contains following errors:\n";
 
 	std::map<BRepCheck_Status, int> stats;
@@ -373,11 +373,9 @@ is_shape_valid(int i, const TopoDS_Shape &shape)
 	{
 		if (pair.first != BRepCheck_NoError)
 		{
-			log << ' ' << pair.first << ' ' << pair.second << " times";
+			log << ' ' << pair.first << ' ' << pair.second << " times\n";
 		}
 	}
-
-	log << "\n";
 
 	spdlog::warn(log.str());
 
@@ -391,7 +389,7 @@ document::count_invalid_shapes() const
 	size_t num_invalid = 0;
 	for (const auto &shape : solid_shapes)
 	{
-		if (!is_shape_valid(i, shape))
+		if (!is_shape_valid(i, solid_labels.at(i), shape))
 		{
 			num_invalid += 1;
 		}
