@@ -342,13 +342,17 @@ void BrepFaceter::create_volumes_and_add_children(const TopTools_HSequenceOfShap
 entity_vector BrepFaceter::facet(const TopTools_HSequenceOfShape &shape_list,
                                  const FacetingTolerance &facet_tol)
 {
+  spdlog::info("Creating surfaces");
   // build surfaceMap (with early creations of surface meshsets) so we have a
   // set of unique faces for faceting
   create_surfaces(shape_list);
 
+  spdlog::info("Performing faceting");
   perform_faceting(facet_tol);
+  spdlog::info("Populating surfaces");
   populate_all_surfaces();
 
+  spdlog::info("Creating volumes and adding children");
   // Note: Not much further "population" of volumes required, since they have
   // no contents (they do have children) and their children have already been
   // created and populated.

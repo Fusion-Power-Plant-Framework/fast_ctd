@@ -229,6 +229,7 @@ public:
 
 	void fix_shapes(double precision, double max_tolerance)
 	{
+		int nshape = 0;
 		for (auto &shape : doc.solid_shapes)
 		{
 			ShapeFix_Shape fixer{shape};
@@ -239,7 +240,7 @@ public:
 			{
 				std::ostringstream log;
 
-				log << "shapefixer=" << fixed;
+				log << "(" << doc.solid_labels.at(nshape) << ") shapefixer=" << fixed;
 				if (fixer.Status(ShapeExtend_DONE1))
 					log << ", some free edges were fixed";
 				if (fixer.Status(ShapeExtend_DONE2))
@@ -257,6 +258,7 @@ public:
 
 				shape = fixer.Shape();
 			}
+			nshape += 1;
 		}
 	}
 
@@ -278,7 +280,8 @@ public:
 			}
 
 			std::ostringstream log;
-			log << "Fixing shape " << nshape++;
+			log << "Fixing shape " << nshape << " (" << doc.solid_labels.at(nshape) << ")";
+			nshape += 1;
 
 			if (small_res)
 			{
