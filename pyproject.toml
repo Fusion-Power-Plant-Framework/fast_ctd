@@ -8,7 +8,6 @@ license         = { text = 'GPL-2.0' }
 
 [project.optional-dependencies]
 dev = [
-  "build",
   "meson-python",
   "meson>=1.8.0",
   "pre-commit",
