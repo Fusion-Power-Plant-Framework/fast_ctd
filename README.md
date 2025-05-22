@@ -2,15 +2,52 @@
 
 This is a Python package for the fast conversion of STEP files to DAGMC models (.h5m files).
 
-## Local install and build wheel
+This package wraps certain C++ modules from the following projects that enable this conversion:
 
-Development of this package is done in a conda environment. To create the environment, run (replace `conda` with `mamba` if you use that):
+- [overlap_checker](https://github.com/ukaea/overlap_checker)
+- [occ_faceter](https://github.com/makeclean/occ_faceter)
+
+And exposes a Python interface to them using [nanobind](https://nanobind.readthedocs.io/en/latest/).
+
+## Quick start
+
+This project requires the following packages pre-installed:
+
+- cmake
+- OpenCASCADE 7.8.0 or later
+- MOAB 5.0.0 or later
+
+The recommended way to install these dependencies is to use `conda` and can be installed with the following (`openmc` bundles `MOAB`):
+
+```bash
+conda install -c conda-forge 'openmc>=0.15.0=dagmc_*' 'occt>=7.8.0=all_*' cmake
+```
+
+Use `pip` to remotely install the package:
+
+```bash
+pip install fast_ctd@git+https://github.com/Fusion-Power-Plant-Framework/fast_ctd@main
+```
+
+or clone the repository and install it locally:
+
+```bash
+git clone https://github.com/Fusion-Power-Plant-Framework/fast_ctd.git
+cd fast_ctd
+pip install .
+```
+
+## Development installation
+
+Development of this package is done in a conda environment.
+
+To create the environment, run:
 
 ```bash
 conda env create -f conda/environment.yml
 ```
 
-This will create a conda environment called `fast_ctd` with all the dependencies C++ depencencies needed for development. It also locally installs the package in editable mode (compiles and installs the C++ extensions using `meson` under the hood).
+This will create a conda environment called `fast_ctd`. It locally installs the package in editable mode (`meson` is used to compile the C++ code with `nanobind` to create the extension under the hood).
 
 Activate the `fast_ctd` environment (or set it as the default interpreter in your IDE):
 
@@ -25,36 +62,21 @@ cd examples
 python stp_to_dagmc_workflow.py
 ```
 
-With the correct conda environment activated, you can build the
-wheel file by:
-
-```bash
- python -m build --config-setting=setup-args=-DPY_ENV_ROOT_PATH=$CONDA_PREFIX
-```
-
-### Installing the wheel in a different environment
-
-The fast_ctd package (the wheel) may be install, in other python environments, by:
-
-```bash
-pip install dist/fast_ctd-0.1.0-py3-none-any.whl
-```
-
-(with the intended python environment activated).
-
-## Local development
-
 ### Changing the C++ source
 
-If you change the C++ code, you usually don't need to do anything as `nanobind` can detect changes and will automatically recompile the extension. However, changing some files (like `binding.cpp`) will require a reinstall:
+The editable install of the package (included in the conda `environment.yml`) means you can edit the C++ source code and run the Python code without needing to reinstall (rebuild) the package. `nanobind` automatically detects changes and recompiles the extension when you run the Python code.
+
+However, changing some files (for example `binding.cpp`) will require a reinstall, which can be done with:
 
 ```bash
 pip install -e .
 ```
 
+`nanobind` will throw an error when you try to run the Python code without reinstalling after changing files that require it.
+
 ### Meson compilation (directly)
 
-Sometimes it's usefull to test the meson compilation directly, run this once:
+Sometimes it's useful to test the meson compilation directly, run this once:
 
 ```bash
 meson setup --wipe builddir

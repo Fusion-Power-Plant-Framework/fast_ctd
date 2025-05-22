@@ -1,0 +1,6 @@
+The C++ source code (in the `src/` folder) wrapped by this Python package is adapted from the following projects:
+
+- [overlap_checker](https://github.com/ukaea/overlap_checker) licensed under GPLv2 which can be found [here](https://github.com/ukaea/overlap_checker/blob/main/LICENSE).
+- [occ_faceter](https://github.com/makeclean/occ_faceter) licensed under GPLv2, which can be found [here](https://github.com/makeclean/occ_faceter/blob/master/LICENSE).
+
+The original source code has been updated to use a modern logging library and upgraded to support the latest versions of OpenCASCADE, MOAB and Python. Only essential components required for this project have been retained and some of the code has been refactored to improve readability and maintainability.

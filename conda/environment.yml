@@ -2,8 +2,6 @@ name: fast_ctd
 channels:
   - conda-forge
 
-# NOTE: cmake and occt are the only dependencies you need to build the project.
-
 dependencies:
   - python >=3.11,<3.12
   - openmc=0.15.0=dagmc_*
