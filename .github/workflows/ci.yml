@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-run-example:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install conda environment
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: fast_ctd
+          environment-file: conda/environment.yml
+          miniforge-version: "latest"
+          use-only-tar-bz2: false
+          auto-activate-base: false
+          conda-remove-defaults: true
+          python-version: "3.11"
+
+      - name: Run example
+        run: |
+          cd examples
+          python stp_to_dagmc_workflow.py
