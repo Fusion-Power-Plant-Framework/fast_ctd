@@ -9,12 +9,17 @@ from fast_ctd import (
     step_to_brep,
 )
 
-input_stp_file = "data/EUDEMO.stp"
-brep_file = "data/EUDEMO.brep"
-merged_brep_file = "data/EUDEMO-merged.brep"
-output_dagmc_file = "data/EUDEMO-nwt.h5m"
-output_wt_dagmc_file = "data/EUDEMO.h5m"
-output_dagmc_vtk_file = "data/EUDEMO.vtk"
+# These file names can be anything
+
+ex_obj_name = "test_cubes"
+materials_csv_file = f"data/{ex_obj_name}-mats.csv"
+
+input_stp_file = f"data/{ex_obj_name}.stp"
+brep_file = f"data/{ex_obj_name}.brep"
+merged_brep_file = f"data/{ex_obj_name}-merged.brep"
+output_dagmc_file = f"data/{ex_obj_name}-nwt.h5m"
+output_wt_dagmc_file = f"data/{ex_obj_name}.h5m"
+output_dagmc_vtk_file = f"data/{ex_obj_name}.vtk"
 
 enable_debug_logging = True
 
@@ -56,7 +61,7 @@ else:
 print("Creating VTK model - view in Paraview")
 mbc = dagmc_to_vtk(output_wt_dagmc_file, output_dagmc_vtk_file)
 
-# Validate DAGMC model using OpenMC
+# Validate DAGMC model using OpenMC -- future work
 
 # validate_dagmc_model_using_openmc(
 #     dagmc_file=output_wt_dagmc_file,

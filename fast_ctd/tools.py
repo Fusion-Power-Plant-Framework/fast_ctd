@@ -19,13 +19,6 @@ except ImportError:
 
 StrPath = str | Path
 
-# todo:
-# - add ests
-# - add a README.md with usage examples
-# - add openmc validation work
-# - stub file generation and installing from nanobind: python -m nanobind.stubgen -m fast_ctd_ext -M py.typed
-# - versioning the project with pyproject.toml and meson project version https://github.com/mesonbuild/meson/issues/688S
-
 
 def step_to_brep(
     input_step_file: StrPath,
@@ -344,4 +337,8 @@ def validate_dagmc_model_using_openmc(
     materials_def: str | list | dict = "",
 ) -> bool:
     """Validate a DAGMC model using OpenMC."""
-    return True
+    raise NotImplementedError(
+        "This function has not yet been implemented. "  # noqa: EM101
+        "It would run OpenMC with the DAGMC file provided, "
+        "with a set of fake materials to check if the model is valid.",
+    )
