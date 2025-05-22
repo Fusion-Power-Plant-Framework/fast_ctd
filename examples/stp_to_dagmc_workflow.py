@@ -41,7 +41,7 @@ print("Converting to DAGMC")
 facet_brep_to_dagmc(
     merged_brep_file,
     output_h5m_file=output_dagmc_file,
-    materials_csv_file="data/EUDEMO-materials.csv",
+    materials_csv_file=materials_csv_file,
     enable_logging=enable_debug_logging,
 )
 
