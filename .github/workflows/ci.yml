@@ -25,6 +25,7 @@ jobs:
           python-version: "3.11"
 
       - name: Run example
+        shell: bash -l {0}
         run: |
           cd examples
           python stp_to_dagmc_workflow.py
