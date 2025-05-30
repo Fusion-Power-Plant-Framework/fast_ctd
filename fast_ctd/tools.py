@@ -218,7 +218,7 @@ def make_watertight(
             "-o",
             output_h5m_file.as_posix(),
         ],
-        check=False,
+        check=True,
         text=True,
         capture_output=True,
     )
@@ -262,7 +262,7 @@ def check_watertight(
 
     return sp.run(  # noqa: S603
         cmds,
-        check=False,
+        check=True,
         text=True,
         capture_output=True,
     )
@@ -279,6 +279,8 @@ def decode_tightness_checks(stdout: str) -> list[float | int] | None:
         None if the output is empty or does not contain any decodable values.
     """
     percentages = re.findall(r"(\d+\.\d+|\d+)%", stdout)
+    if not percentages:
+        return None
     try:
         percentages = [float(p) for p in percentages]
     except ValueError:
