@@ -256,7 +256,7 @@ def check_watertight(
     validate_file_extension(h5m_file, ".h5m")
     validate_file_exists(h5m_file)
 
-    cmds = [check_watertight_bin_path.as_posix(), "-o", h5m_file.as_posix()]
+    cmds = [check_watertight_bin_path.as_posix(), h5m_file.as_posix()]
     if tolerance is not None:
         cmds.extend(["-t", str(tolerance)])
 
