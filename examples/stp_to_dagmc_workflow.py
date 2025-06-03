@@ -1,5 +1,7 @@
 """An example of a workflow to convert a STEP file to a DAGMC file using fast_ctd."""
 
+from pathlib import Path
+
 from fast_ctd import (
     dagmc_to_vtk,
     decode_tightness_checks,
@@ -12,14 +14,15 @@ from fast_ctd import (
 # These file names can be anything
 
 ex_obj_name = "test_cubes"
-materials_csv_file = f"data/{ex_obj_name}-mats.csv"
+data_path = Path(__file__).parent / "data"
 
-input_stp_file = f"data/{ex_obj_name}.stp"
-brep_file = f"data/{ex_obj_name}.brep"
-merged_brep_file = f"data/{ex_obj_name}-merged.brep"
-output_dagmc_file = f"data/{ex_obj_name}-nwt.h5m"
-output_wt_dagmc_file = f"data/{ex_obj_name}.h5m"
-output_dagmc_vtk_file = f"data/{ex_obj_name}.vtk"
+materials_csv_file = data_path / f"{ex_obj_name}-mats.csv"
+input_stp_file = data_path / f"{ex_obj_name}.stp"
+brep_file = data_path / f"{ex_obj_name}.brep"
+merged_brep_file = data_path / f"{ex_obj_name}-merged.brep"
+output_dagmc_file = data_path / f"{ex_obj_name}-nwt.h5m"
+output_wt_dagmc_file = data_path / f"{ex_obj_name}.h5m"
+output_dagmc_vtk_file = data_path / f"{ex_obj_name}.vtk"
 
 enable_debug_logging = True
 
@@ -59,11 +62,4 @@ else:
     print(wt.stderr)
 
 print("Creating VTK model - view in Paraview")
-mbc = dagmc_to_vtk(output_wt_dagmc_file, output_dagmc_vtk_file)
-
-# Validate DAGMC model using OpenMC -- future work
-
-# validate_dagmc_model_using_openmc(
-#     dagmc_file=output_wt_dagmc_file,
-#     materials_def="data/EUDEMO-materials.csv",
-# )
+dagmc_to_vtk(output_wt_dagmc_file, output_dagmc_vtk_file)
