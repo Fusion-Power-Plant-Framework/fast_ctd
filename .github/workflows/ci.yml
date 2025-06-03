@@ -7,8 +7,14 @@ on:
       - main
 
 jobs:
-  build-and-run-example:
+  build-test-run-example:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,7 +28,14 @@ jobs:
           use-only-tar-bz2: false
           auto-activate-base: false
           conda-remove-defaults: true
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run tests
+        shell: bash -l {0}
+        run: |
+          pytest --cov=fast_ctd \
+                 --cov-report html:lcov.html \
+                 tests
 
       - name: Run example
         shell: bash -l {0}
