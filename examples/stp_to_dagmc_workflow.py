@@ -63,9 +63,3 @@ else:
 
 print("Creating VTK model - view in Paraview")
 dagmc_to_vtk(output_wt_dagmc_file, output_dagmc_vtk_file)
-
-# Validate DAGMC model using OpenMC -- future work
-
-# validate_dagmc_model_using_openmc(
-#     dagmc_file=output_wt_dagmc_file
-# )
