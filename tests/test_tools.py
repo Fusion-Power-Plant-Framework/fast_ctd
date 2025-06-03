@@ -1,6 +1,14 @@
 import pytest
 
-from fast_ctd import check_watertight, decode_tightness_checks, make_watertight
+from fast_ctd import (
+    check_watertight,
+    dagmc_to_vtk,
+    decode_tightness_checks,
+    facet_brep_to_dagmc,
+    make_watertight,
+    merge_brep_geometries,
+    step_to_brep,
+)
 
 
 @pytest.fixture
@@ -8,6 +16,38 @@ def test_data_path():
     from pathlib import Path
 
     return Path(__file__).parent / "test_data"
+
+
+def test_tools_output_existence_checks(tmp_path, test_data_path):
+    """Test that the tools output files are created and exist."""
+    tst_obj_name = "test_cubes"
+
+    input_stp_file = test_data_path / f"{tst_obj_name}.stp"
+    materials_csv_file = test_data_path / f"{tst_obj_name}-mats.csv"
+
+    brep_file = tmp_path / f"{tst_obj_name}.brep"
+    merged_brep_file = tmp_path / f"{tst_obj_name}-merged.brep"
+    output_dagmc_file = tmp_path / f"{tst_obj_name}-nwt.h5m"
+    output_dagmc_vtk_file = tmp_path / f"{tst_obj_name}.vtk"
+
+    comps_info = step_to_brep(input_stp_file, brep_file)
+    assert brep_file.exists(), "BREP file was not created"
+    assert len(comps_info) > 0, "No components found in BREP file"
+
+    merge_brep_geometries(brep_file, merged_brep_file)
+    assert merged_brep_file.exists(), "Merged BREP file was not created"
+
+    facet_brep_to_dagmc(
+        merged_brep_file,
+        output_h5m_file=output_dagmc_file,
+        materials_csv_file=materials_csv_file,
+    )
+    assert output_dagmc_file.exists(), "DAGMC file was not created"
+    assert output_dagmc_file.stat().st_size > 0, "DAGMC file is empty"
+
+    dagmc_to_vtk(output_dagmc_file, output_dagmc_vtk_file)
+    assert output_dagmc_vtk_file.exists(), "DAGMC VTK file was not created"
+    assert output_dagmc_vtk_file.stat().st_size > 0, "DAGMC VTK file is empty"
 
 
 @pytest.mark.parametrize(

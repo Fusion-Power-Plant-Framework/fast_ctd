@@ -32,7 +32,7 @@ def validate_file_extension(
 
 def validate_file_exists(
     file_path: Path,
-    suffix_stmt: str = "Are you in the right directory?",
+    suffix_stmt: str = "",
 ) -> None:
     """Validate if a file exists."""
     if not file_path.exists():

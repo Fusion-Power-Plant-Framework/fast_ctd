@@ -62,7 +62,7 @@ else:
     print(wt.stderr)
 
 print("Creating VTK model - view in Paraview")
-mbc = dagmc_to_vtk(output_wt_dagmc_file, output_dagmc_vtk_file)
+dagmc_to_vtk(output_wt_dagmc_file, output_dagmc_vtk_file)
 
 # Validate DAGMC model using OpenMC -- future work
 
