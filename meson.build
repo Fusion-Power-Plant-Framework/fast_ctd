@@ -33,13 +33,12 @@ message('Python environment include: ' + py_env_include)
 
 # Deps and libs
 
-nanobind_dep = dependency('nanobind', static: true)
-spdlog = dependency('spdlog', static: true)
-occ = dependency('OpenCASCADE', static: true)
-moab = dependency('MOAB', static: true)
+nanobind_dep = dependency('nanobind')
+spdlog = dependency('spdlog')
+occ = dependency('OpenCASCADE')
+moab = dependency('MOAB')
 # Dependency('MOAB') fails to link properly when imported
 # the library path has to be manually set
-# also static: true does not work
 libmoab = cpp.find_library('MOAB', dirs: [py_env_lib])
 
 # Run each subdir meson.build
