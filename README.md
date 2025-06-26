@@ -20,7 +20,7 @@ This project requires the following packages pre-installed:
 The recommended way to install these dependencies is to use `conda` and can be installed with the following (`openmc` bundles `MOAB`):
 
 ```bash
-conda install -c conda-forge 'openmc>=0.15.0=dagmc_*' 'occt>=7.8.0=all_*' cmake
+conda install -c conda-forge 'openmc>=0.15.2=dagmc_*' 'occt>=7.8.0=all_*' cmake
 ```
 
 Use `pip` to remotely install the package:
