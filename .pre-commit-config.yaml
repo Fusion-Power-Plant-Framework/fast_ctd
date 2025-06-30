@@ -24,5 +24,10 @@ repos:
       - id: prettier
         types_or: [json, yaml]
         args: [--tab-width=2]
+  - repo: https://github.com/citation-file-format/cffconvert
+    rev: 5295f87c0e261da61a7b919fc754e3a77edd98a7
+    hooks:
+      - id: validate-cff
+
 ci:
   autofix_prs: false
