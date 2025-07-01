@@ -2,7 +2,7 @@ project(
   'fast_ctd',
   'cpp',
   version: '0.1.0',
-  meson_version: '>= 1.8.0'
+  meson_version: '>= 1.3.1'
 )
 
 # Compilers
